@@ -42,6 +42,7 @@ export interface AppealDetermination {
   reviewDate: string
   recommendation: string
   rationale: string
+  compareSummary?: string
   evidenceDepth: number
   evidence: EvidenceDoc[]
   criteria: Criterion[]
@@ -82,6 +83,9 @@ export interface PriorAuthRequest {
   criteria: Criterion[]
   determinationIssue?: { requirement: string; detail: string }
   policyVersion: string
+  denialDate?: string
+  originalReviewDate?: string
+  appealOutcomeLabel?: string
   appeal?: AppealDetermination
 }
 
@@ -93,9 +97,12 @@ export const requests: PriorAuthRequest[] = [
     procedureCode: "CPT 22612",
     policyName: "L33747 — Lumbar Fusion (CMS LCD)",
     payerName: "New Century Health",
-    status: "Missing Info",
-    lastUpdated: "Oct 24, 2023 · 09:12 AM",
+    status: "In Review",
+    lastUpdated: "Nov 04, 2023 · 11:30 AM",
     submitted: "Oct 24, 2023 · 09:12 AM",
+    denialDate: "Mar 12",
+    originalReviewDate: "Oct 12, 2023",
+    appealOutcomeLabel: "Appeal · Overturn expected",
     confidence: 64,
     recommendationVerdict: "NOT APPROVED",
     recommendation:
@@ -291,6 +298,8 @@ export const requests: PriorAuthRequest[] = [
       decisionDate: "Apr 05",
       reviewer: "Dr. Sarah Jenkins (Board Certified)",
       reviewDate: "Nov 04, 2023",
+      compareSummary:
+        "The primary discrepancy lies in the initial omission of Physical Therapy (PT) logs. The appeal successfully addressed this by providing a comprehensive medical record export. The clinical necessity is now clearly established through the newly verified documentation of failed conservative treatment and radiographic progression.",
       recommendation:
         "Approve coverage: Appeal documentation confirms guideline compliance.",
       rationale:
@@ -458,8 +467,11 @@ export const requests: PriorAuthRequest[] = [
     policyName: "CAR-2023-44 — Hypertrophic Cardiomyopathy",
     payerName: "New Century Health",
     status: "Denied",
-    lastUpdated: "Oct 24, 2023 · 02:40 PM",
+    lastUpdated: "Nov 18, 2023 · 03:15 PM",
     submitted: "Oct 21, 2023 · 11:05 AM",
+    denialDate: "Oct 24",
+    originalReviewDate: "Oct 24, 2023",
+    appealOutcomeLabel: "Appeal · Upheld",
     confidence: 71,
     recommendationVerdict: "NOT APPROVED",
     recommendation:
@@ -488,9 +500,31 @@ export const requests: PriorAuthRequest[] = [
       "Hypertrophic Cardiomyopathy Guideline for Mavacamten administration and monitoring.",
     policyVersion: "v2.1 Last Update: Oct 24, 2023",
     evidence: [
-      { name: "Echo_Report_Sept23.pdf", added: "Oct 21", size: "3.2 MB", type: "pdf" },
-      { name: "Clinical_Summary.pdf", added: "Oct 21", size: "1.4 MB", type: "pdf" },
-      { name: "Medication_History.pdf", added: "Oct 20", size: "0.6 MB", type: "pdf" },
+      {
+        name: "Echo_Report_Sept23.pdf",
+        added: "Oct 21",
+        size: "3.2 MB",
+        type: "pdf",
+        change: "unchanged",
+        changeNote: "Same echo referenced in appeal.",
+      },
+      {
+        name: "Clinical_Summary.pdf",
+        added: "Oct 21",
+        size: "1.4 MB",
+        type: "pdf",
+        change: "unchanged",
+        changeNote: "No changes in appeal submission.",
+      },
+      {
+        name: "Medication_History.pdf",
+        added: "Oct 20",
+        size: "0.6 MB",
+        type: "pdf",
+        change: "insufficient",
+        changeNote: "Only 2-week Metoprolol trial documented.",
+        relatedDoc: "Extended_Medication_History.pdf",
+      },
     ],
     patient: {
       name: "Robert J. Anderson",
@@ -560,6 +594,89 @@ export const requests: PriorAuthRequest[] = [
       detail:
         "has not been satisfied. The medical policy requires a minimum of 30 days trial for first-line therapies unless contraindicated.",
     },
+    appeal: {
+      decision: "Denied",
+      decisionDate: "Nov 18",
+      reviewer: "Dr. Sarah Jenkins (Board Certified)",
+      reviewDate: "Nov 18, 2023",
+      compareSummary:
+        "The appeal submitted extended medication records, but documentation still confirms only a 21-day Metoprolol trial — short of the 30-day policy requirement. NYHA class and REMS criteria remain satisfied, but prior therapy failure criterion A.2 is unchanged. Original denial is upheld.",
+      recommendation:
+        "Uphold denial: Appeal documentation does not satisfy prior therapy failure requirements.",
+      rationale:
+        "Appeal includes pharmacy printout and cardiology attestation. Metoprolol 25mg BID documented from Oct 1–21, 2023 (21 days). Policy CAR-2023-44 requires minimum 30-day trial of beta-blockers or calcium channel blockers unless contraindicated. No intolerance documentation sufficient to bypass duration requirement.",
+      evidenceDepth: 2,
+      evidence: [
+        {
+          name: "Appeal_Letter_PA-882193.pdf",
+          added: "Nov 02",
+          size: "0.3 MB",
+          type: "pdf",
+          change: "new",
+          changeNote: "Level 1 appeal letter — not in original submission.",
+        },
+        {
+          name: "Extended_Medication_History.pdf",
+          added: "Nov 02",
+          size: "0.8 MB",
+          type: "pdf",
+          change: "updated",
+          changeNote: "Extended records still show only 21-day Metoprolol trial.",
+          relatedDoc: "Medication_History.pdf",
+        },
+        {
+          name: "Cardiology_Attestation.pdf",
+          added: "Nov 02",
+          size: "0.5 MB",
+          type: "pdf",
+          change: "new",
+          changeNote: "Physician letter — does not establish 30-day trial or intolerance.",
+        },
+      ],
+      criteria: [
+        {
+          id: "A",
+          label: "Inclusions & Diagnosis",
+          description:
+            "Confirmed diagnosis of symptomatic obstructive hypertrophic cardiomyopathy (oHCM).",
+          state: "met",
+          evidence: "Unchanged from original determination.",
+          children: [
+            {
+              id: "A.1",
+              label: "New York Heart Association (NYHA) Class",
+              description: "Patient exhibits symptoms consistent with Class II or III.",
+              state: "met",
+              evidence: "Unchanged.",
+            },
+            {
+              id: "A.2",
+              label: "Prior Therapy Failure",
+              description:
+                "Appeal records show 21-day Metoprolol trial. Still below 30-day requirement.",
+              state: "not-met",
+              evidence: "Extended pharmacy records confirm Oct 1–21 only.",
+            },
+          ],
+        },
+        {
+          id: "B",
+          label: "Indications for Use (Safety Monitoring)",
+          description: "Required baseline screenings and ongoing safety commitments.",
+          state: "met",
+          evidence: "Unchanged.",
+          children: [
+            {
+              id: "B.1",
+              label: "Left Ventricular Ejection Fraction (LVEF)",
+              description: "Baseline LVEF must be greater than or equal to 55%.",
+              state: "met",
+              evidence: "Unchanged.",
+            },
+          ],
+        },
+      ],
+    },
   },
   {
     id: "pa-771045",
@@ -569,52 +686,70 @@ export const requests: PriorAuthRequest[] = [
     drug: "Rituxan, Truxima, Ruxience, Riabni",
     policyName: "Rituxan, Truxima, Ruxience, Riabni, Rituxan Hycela",
     payerName: "New Century Health",
-    status: "Approved",
-    lastUpdated: "Jun 12, 2026 · 10:00 PM",
-    submitted: "Jun 08, 2026 · 03:21 PM",
-    confidence: 93,
-    recommendationVerdict: "APPROVED",
+    status: "In Review",
+    lastUpdated: "Nov 08, 2023 · 10:00 AM",
+    submitted: "Oct 18, 2023 · 03:21 PM",
+    denialDate: "Oct 28",
+    originalReviewDate: "Oct 28, 2023",
+    appealOutcomeLabel: "Appeal · Pending review",
+    confidence: 58,
+    recommendationVerdict: "NOT APPROVED",
     recommendation:
-      "All clinical criteria satisfied. Diagnosis, prior therapy, and lab requirements meet medical policy guidelines.",
+      "Second-line Rituximab is not supported without documented failure or contraindication to first-line chemoimmunotherapy. Submitted records do not confirm prior R-CHOP completion or progression.",
     checks: [
-      { label: "Medical Necessity", sublabel: "Passed", passed: true },
+      { label: "Medical Necessity", sublabel: "Failed", passed: false },
       { label: "Plan Eligibility", sublabel: "Verified", passed: true },
       { label: "Provider Network", sublabel: "In-Network", passed: true },
     ],
     rationale: [
       {
-        title: "Diagnosis Confirmed",
+        title: "Prior Line of Therapy Not Documented",
         detail:
-          "Pathology confirms CD20-positive B-cell non-Hodgkin lymphoma. Diagnosis meets covered indication under policy.",
+          "Policy requires documented failure of, or contraindication to, first-line chemoimmunotherapy (R-CHOP or equivalent). Treatment summary lists diagnosis only; no infusion dates or response assessment.",
       },
       {
-        title: "Prior Therapy Documented",
+        title: "Histology Confirmed",
         detail:
-          "Records confirm appropriate first-line therapy and response monitoring per guideline requirements.",
+          "Pathology confirms CD20-positive follicular lymphoma grade 2. Diagnosis criterion is met.",
       },
     ],
     policyCodes: ["J-Code J9312", "ICD-10 C83.30"],
     policyFile: "Rituxan_Policy.pdf",
-    policyRef: "Policy #ONC-2026-12",
+    policyRef: "Policy #ONC-2023-12",
     policyGuideline:
-      "Oncology biologics guideline for Rituximab and biosimilar administration.",
-    policyVersion: "v3.0 Last Update: Jun 01, 2026",
+      "Oncology biologics guideline for Rituximab and biosimilar administration in B-cell lymphoma.",
+    policyVersion: "v2.4 Last Update: Sep 15, 2023",
     evidence: [
-      { name: "Pathology_Report.pdf", added: "Jun 08", size: "2.0 MB", type: "pdf" },
-      { name: "Treatment_History.pdf", added: "Jun 07", size: "1.1 MB", type: "pdf" },
+      {
+        name: "Pathology_Report.pdf",
+        added: "Oct 18",
+        size: "2.0 MB",
+        type: "pdf",
+        change: "unchanged",
+        changeNote: "Diagnosis confirmed — not disputed in appeal.",
+      },
+      {
+        name: "Treatment_History_Summary.pdf",
+        added: "Oct 18",
+        size: "1.1 MB",
+        type: "pdf",
+        change: "insufficient",
+        changeNote: "Missing R-CHOP dates and response assessment.",
+        relatedDoc: "Infusion_Records_R-CHOP.pdf",
+      },
     ],
     patient: {
       name: "Jane Doe",
       dob: "11/02/1969",
-      age: 56,
+      age: 54,
       sex: "F",
       email: "jane.doe@gmail.com",
-      address: "7423 Willow Creek Drive",
+      address: "7423 Willow Creek Drive, Austin, TX",
     },
     provider: {
-      name: "Emma Watson",
-      email: "emma.watson@gmail.com",
-      address: "—",
+      name: "Dr. Elena Morales, MD",
+      email: "e.morales@oncologygroup.com",
+      address: "500 Cancer Center Dr, Austin, TX",
       npi: "1457823901",
     },
     reviewer: {
@@ -622,14 +757,14 @@ export const requests: PriorAuthRequest[] = [
       org: "Reviewer Organization B",
       email: "k.highland@revieworg.com",
     },
-    requestingMd: "Emma Watson, MD",
+    requestingMd: "Dr. Elena Morales, MD",
     criteria: [
       {
         id: "A",
         label: "Inclusions & Diagnosis",
         description: "Confirmed CD20-positive B-cell non-Hodgkin lymphoma.",
         state: "met",
-        evidence: "Pathology confirmed.",
+        evidence: "Pathology confirmed follicular lymphoma grade 2.",
         children: [
           {
             id: "A.1",
@@ -640,7 +775,124 @@ export const requests: PriorAuthRequest[] = [
           },
         ],
       },
+      {
+        id: "B",
+        label: "Prior Therapy Requirements",
+        description: "Documented prior line failure or contraindication.",
+        state: "not-met",
+        evidence: "No R-CHOP completion or progression documented.",
+        children: [
+          {
+            id: "B.1",
+            label: "First-Line Chemoimmunotherapy",
+            description: "R-CHOP or equivalent trial documented.",
+            state: "not-met",
+            evidence: "Treatment summary lacks infusion dates.",
+          },
+          {
+            id: "B.2",
+            label: "Progression or Intolerance",
+            description: "Relapse or inadequate response after first-line therapy.",
+            state: "not-met",
+            evidence: "No response assessment on file.",
+          },
+        ],
+      },
     ],
+    determinationIssue: {
+      requirement: "B.1 (First-Line Chemoimmunotherapy)",
+      detail:
+        "has not been satisfied. Policy requires documented prior R-CHOP or equivalent before second-line Rituximab.",
+    },
+    appeal: {
+      decision: "In Review",
+      decisionDate: "Pending",
+      reviewer: "Pending assignment",
+      reviewDate: "Nov 08, 2023",
+      compareSummary:
+        "Level 1 appeal received with infusion records and restaging imaging. Reviewer is evaluating whether R-CHOP completion and progression are now documented. Diagnosis criterion remains met; prior therapy criteria are under active review.",
+      recommendation:
+        "Appeal under review: Awaiting verification of first-line therapy completion and disease progression.",
+      rationale:
+        "Appeal package includes infusion records (Exhibits A–C) and PET restaging report suggesting progression after 6 cycles R-CHOP. Payer review in progress to validate dates, response assessment, and policy alignment for second-line Rituximab.",
+      evidenceDepth: 2,
+      evidence: [
+        {
+          name: "Appeal_Letter_PA-771045.pdf",
+          added: "Nov 05",
+          size: "0.4 MB",
+          type: "pdf",
+          change: "new",
+          changeNote: "Level 1 appeal letter — not in original submission.",
+        },
+        {
+          name: "Infusion_Records_R-CHOP.pdf",
+          added: "Nov 05",
+          size: "2.8 MB",
+          type: "pdf",
+          change: "new",
+          changeNote: "Chemo infusion dates — may address prior therapy gap.",
+          relatedDoc: "Treatment_History_Summary.pdf",
+        },
+        {
+          name: "PET_Restaging_Nov2023.pdf",
+          added: "Nov 05",
+          size: "4.1 MB",
+          type: "pdf",
+          change: "new",
+          changeNote: "Restaging imaging submitted with appeal.",
+        },
+        {
+          name: "Oncology_Progress_Note.pdf",
+          added: "Nov 06",
+          size: "0.7 MB",
+          type: "pdf",
+          change: "new",
+          changeNote: "Progress note documenting relapse after first-line therapy.",
+        },
+      ],
+      criteria: [
+        {
+          id: "A",
+          label: "Inclusions & Diagnosis",
+          description: "Confirmed CD20-positive B-cell non-Hodgkin lymphoma.",
+          state: "met",
+          evidence: "Unchanged from original determination.",
+          children: [
+            {
+              id: "A.1",
+              label: "Histology Confirmation",
+              description: "Biopsy-confirmed histology required.",
+              state: "met",
+              evidence: "Unchanged.",
+            },
+          ],
+        },
+        {
+          id: "B",
+          label: "Prior Therapy Requirements",
+          description: "Documented prior line failure or contraindication.",
+          state: "not-met",
+          evidence: "Under review — new infusion records submitted.",
+          children: [
+            {
+              id: "B.1",
+              label: "First-Line Chemoimmunotherapy",
+              description: "Appeal infusion records show 6 R-CHOP cycles Jun–Sep 2023.",
+              state: "met",
+              evidence: "Pending verification against infusion logs (Exhibit A).",
+            },
+            {
+              id: "B.2",
+              label: "Progression or Intolerance",
+              description: "PET restaging suggests progression — under review.",
+              state: "not-met",
+              evidence: "Awaiting radiology confirmation.",
+            },
+          ],
+        },
+      ],
+    },
   },
 ]
 

@@ -15,13 +15,42 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import type { Criterion, DocChange, EvidenceDoc, PriorAuthRequest } from "@/lib/data"
+import type { Criterion, DocChange, EvidenceDoc, PriorAuthRequest, RequestStatus } from "@/lib/data"
 
 type Mode = "overview" | "tree"
+
+function appealDecisionStyle(decision: RequestStatus) {
+  if (decision === "Approved") {
+    return {
+      badge: "APPROVED",
+      badgeClass: "bg-success/12 text-success",
+      pillClass: "bg-success/12 text-success",
+      recClass: "text-primary",
+      borderClass: "border-l-primary",
+    }
+  }
+  if (decision === "Denied") {
+    return {
+      badge: "UPHELD",
+      badgeClass: "bg-destructive/10 text-destructive",
+      pillClass: "bg-destructive/10 text-destructive",
+      recClass: "text-destructive",
+      borderClass: "border-l-destructive",
+    }
+  }
+  return {
+    badge: "IN REVIEW",
+    badgeClass: "bg-primary/10 text-primary",
+    pillClass: "bg-primary/10 text-primary",
+    recClass: "text-primary",
+    borderClass: "border-l-primary",
+  }
+}
 
 export function CompareView({ req }: { req: PriorAuthRequest }) {
   const [mode, setMode] = useState<Mode>("overview")
   const appeal = req.appeal!
+  const appealStyle = appealDecisionStyle(appeal.decision)
 
   return (
     <div>
@@ -58,15 +87,22 @@ export function CompareView({ req }: { req: PriorAuthRequest }) {
             Original Decision
           </p>
           <span className="mt-1 inline-flex rounded-md bg-destructive/10 px-2 py-0.5 text-sm font-semibold text-destructive">
-            Denied (Mar 12)
+            Denied ({req.denialDate ?? "—"})
           </span>
         </div>
         <div>
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Appeal Decision
           </p>
-          <span className="mt-1 inline-flex rounded-md bg-success/12 px-2 py-0.5 text-sm font-semibold text-success">
-            Approved ({appeal.decisionDate})
+          <span
+            className={cn(
+              "mt-1 inline-flex rounded-md px-2 py-0.5 text-sm font-semibold",
+              appealStyle.pillClass,
+            )}
+          >
+            {appeal.decision === "In Review"
+              ? "In Review"
+              : `${appeal.decision} (${appeal.decisionDate})`}
           </span>
         </div>
       </div>
@@ -119,6 +155,7 @@ function SummaryItem({ label, value }: { label: string; value: string }) {
 
 function OverviewComparison({ req }: { req: PriorAuthRequest }) {
   const appeal = req.appeal!
+  const appealStyle = appealDecisionStyle(appeal.decision)
   return (
     <>
       <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
@@ -134,15 +171,17 @@ function OverviewComparison({ req }: { req: PriorAuthRequest }) {
             <div className="p-5">
               <SectionLabel>Recommendation</SectionLabel>
               <p className="mt-1 text-base font-bold leading-snug text-destructive">
-                Deny coverage based on Clinical Guideline: Lack of documented
-                conservative therapy.
+                {req.recommendation}
               </p>
               <SectionLabel className="mt-5">Rationale</SectionLabel>
               <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                {req.recommendation}
+                {req.rationale[0]?.detail ?? req.recommendation}
               </p>
               <div className="mt-5 space-y-3 border-t border-border pt-4">
-                <KeyVal label="Review Date" value="Oct 12, 2023" />
+                <KeyVal
+                  label="Review Date"
+                  value={req.originalReviewDate ?? req.lastUpdated.split(" ·")[0]}
+                />
               </div>
             </div>
             <DocList title="Patient Charts" docs={req.evidence} side="original" />
@@ -153,14 +192,24 @@ function OverviewComparison({ req }: { req: PriorAuthRequest }) {
         <div>
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-lg font-bold text-foreground">Appeal Request</h2>
-            <span className="rounded-md bg-success/12 px-2.5 py-1 text-xs font-bold text-success">
-              APPROVED
+            <span
+              className={cn(
+                "rounded-md px-2.5 py-1 text-xs font-bold",
+                appealStyle.badgeClass,
+              )}
+            >
+              {appealStyle.badge}
             </span>
           </div>
-          <article className="overflow-hidden rounded-xl border border-l-4 border-l-primary border-border bg-card shadow-sm">
+          <article
+            className={cn(
+              "overflow-hidden rounded-xl border border-l-4 border-border bg-card shadow-sm",
+              appealStyle.borderClass,
+            )}
+          >
             <div className="p-5">
               <SectionLabel>Recommendation</SectionLabel>
-              <p className="mt-1 text-base font-bold leading-snug text-primary">
+              <p className={cn("mt-1 text-base font-bold leading-snug", appealStyle.recClass)}>
                 {appeal.recommendation}
               </p>
               <SectionLabel className="mt-5">Rationale</SectionLabel>
@@ -188,12 +237,8 @@ function OverviewComparison({ req }: { req: PriorAuthRequest }) {
                 Review Summary &amp; Discrepancy
               </h3>
               <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                The primary discrepancy lies in the initial omission of Physical
-                Therapy (PT) logs. The appeal successfully addressed this by
-                providing a comprehensive medical record export. The clinical
-                necessity is now clearly established through the newly verified
-                documentation of failed conservative treatment and radiographic
-                progression.
+                {appeal.compareSummary ??
+                  "Compare original determination evidence against appeal submission to identify discrepancies."}
               </p>
             </div>
           </div>
@@ -414,6 +459,7 @@ function flatten(criteria: Criterion[]): Criterion[] {
 
 function TreeComparison({ req }: { req: PriorAuthRequest }) {
   const appeal = req.appeal!
+  const appealStyle = appealDecisionStyle(appeal.decision)
   const originalMap = new Map(flatten(req.criteria).map((c) => [c.id, c]))
 
   return (
@@ -438,10 +484,19 @@ function TreeComparison({ req }: { req: PriorAuthRequest }) {
             <h2 className="text-lg font-bold text-foreground">Appeal Determination</h2>
             <span className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
               <Sparkles className="size-3" />
-              New Evidence
+              {appeal.decision === "Approved"
+                ? "New Evidence"
+                : appeal.decision === "Denied"
+                  ? "Upheld"
+                  : "Under Review"}
             </span>
           </div>
-          <div className="rounded-xl border border-l-4 border-l-primary border-border bg-card p-4 shadow-sm">
+          <div
+            className={cn(
+              "rounded-xl border border-l-4 border-border bg-card p-4 shadow-sm",
+              appealStyle.borderClass,
+            )}
+          >
             {appeal.criteria.map((c) => (
               <TreeNode
                 key={c.id}

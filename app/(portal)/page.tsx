@@ -69,6 +69,11 @@ export default function PriorAuthListPage() {
               </div>
               <div className="md:col-span-2">
                 <StatusBadge status={req.status} />
+                {req.appealOutcomeLabel && (
+                  <p className="mt-1 text-xs font-medium text-muted-foreground">
+                    {req.appealOutcomeLabel}
+                  </p>
+                )}
               </div>
               <div className="text-sm text-muted-foreground md:col-span-2">
                 {req.lastUpdated}
@@ -82,7 +87,7 @@ export default function PriorAuthListPage() {
                   <Trash2 className="size-4" />
                 </button>
                 <Link
-                  href={`/requests/${req.id}`}
+                  href={`/requests/${req.id}${req.appeal ? "/compare" : ""}`}
                   aria-label="Open request"
                   className="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
