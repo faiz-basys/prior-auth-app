@@ -142,7 +142,6 @@ function OverviewComparison({ req }: { req: PriorAuthRequest }) {
                 {req.recommendation}
               </p>
               <div className="mt-5 space-y-3 border-t border-border pt-4">
-                <KeyVal label="Reviewer" value="Dr. Marcus Vance (Internal)" />
                 <KeyVal label="Review Date" value="Oct 12, 2023" />
               </div>
             </div>
@@ -169,7 +168,6 @@ function OverviewComparison({ req }: { req: PriorAuthRequest }) {
                 {appeal.rationale}
               </p>
               <div className="mt-5 space-y-3 border-t border-border pt-4">
-                <KeyVal label="Appellate Reviewer" value={appeal.reviewer} />
                 <KeyVal label="Review Date" value={appeal.reviewDate} />
               </div>
             </div>
