@@ -27,7 +27,7 @@ export function AppSidebar() {
     <aside className="hidden w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar lg:flex">
       <div className="px-6 py-5">
         <h1 className="text-lg font-bold tracking-tight text-foreground">
-          MediFlow Admin
+          FHP Admin
         </h1>
         <p className="text-xs text-muted-foreground">Clinical Review Portal</p>
       </div>

@@ -10,7 +10,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'MediFlow Admin — Clinical Review Portal',
+  title: 'FHP Admin — Clinical Review Portal',
   description:
     'Clinical review portal for managing prior authorization requests, appeals, and decision logic.',
   generator: 'v0.app',

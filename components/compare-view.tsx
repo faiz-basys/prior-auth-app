@@ -6,13 +6,16 @@ import {
   XCircle,
   Info,
   Sparkles,
-  CircleCheck,
   FileDown,
   CheckCircle,
+  FileText,
+  ImageIcon,
+  BarChart3,
+  ChevronDown,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import type { Criterion, PriorAuthRequest } from "@/lib/data"
+import type { Criterion, EvidenceDoc, PriorAuthRequest } from "@/lib/data"
 
 type Mode = "overview" | "tree"
 
@@ -118,7 +121,7 @@ function OverviewComparison({ req }: { req: PriorAuthRequest }) {
   const appeal = req.appeal!
   return (
     <>
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
         {/* Original */}
         <div>
           <div className="mb-3 flex items-center justify-between">
@@ -127,21 +130,23 @@ function OverviewComparison({ req }: { req: PriorAuthRequest }) {
               DENIED
             </span>
           </div>
-          <article className="h-full rounded-xl border border-border bg-card p-5 shadow-sm">
-            <SectionLabel>Recommendation</SectionLabel>
-            <p className="mt-1 text-base font-bold leading-snug text-destructive">
-              Deny coverage based on Clinical Guideline: Lack of documented
-              conservative therapy.
-            </p>
-            <SectionLabel className="mt-5">Rationale</SectionLabel>
-            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              {req.recommendation}
-            </p>
-            <div className="mt-5 space-y-3 border-t border-border pt-4">
-              <KeyVal label="Reviewer" value="Dr. Marcus Vance (Internal)" />
-              <KeyVal label="Review Date" value="Oct 12, 2023" />
-              <DepthRow label="Evidence Depth" filled={1} tone="destructive" />
+          <article className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <div className="p-5">
+              <SectionLabel>Recommendation</SectionLabel>
+              <p className="mt-1 text-base font-bold leading-snug text-destructive">
+                Deny coverage based on Clinical Guideline: Lack of documented
+                conservative therapy.
+              </p>
+              <SectionLabel className="mt-5">Rationale</SectionLabel>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                {req.recommendation}
+              </p>
+              <div className="mt-5 space-y-3 border-t border-border pt-4">
+                <KeyVal label="Reviewer" value="Dr. Marcus Vance (Internal)" />
+                <KeyVal label="Review Date" value="Oct 12, 2023" />
+              </div>
             </div>
+            <DocList title="Patient Charts" docs={req.evidence} />
           </article>
         </div>
 
@@ -153,20 +158,22 @@ function OverviewComparison({ req }: { req: PriorAuthRequest }) {
               APPROVED
             </span>
           </div>
-          <article className="h-full rounded-xl border-l-4 border-l-primary border border-border bg-card p-5 shadow-sm">
-            <SectionLabel>Recommendation</SectionLabel>
-            <p className="mt-1 text-base font-bold leading-snug text-primary">
-              {appeal.recommendation}
-            </p>
-            <SectionLabel className="mt-5">Rationale</SectionLabel>
-            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              {appeal.rationale}
-            </p>
-            <div className="mt-5 space-y-3 border-t border-border pt-4">
-              <KeyVal label="Appellate Reviewer" value={appeal.reviewer} />
-              <KeyVal label="Review Date" value={appeal.reviewDate} />
-              <DepthRow label="Evidence Depth" filled={3} tone="primary" />
+          <article className="overflow-hidden rounded-xl border border-l-4 border-l-primary border-border bg-card shadow-sm">
+            <div className="p-5">
+              <SectionLabel>Recommendation</SectionLabel>
+              <p className="mt-1 text-base font-bold leading-snug text-primary">
+                {appeal.recommendation}
+              </p>
+              <SectionLabel className="mt-5">Rationale</SectionLabel>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                {appeal.rationale}
+              </p>
+              <div className="mt-5 space-y-3 border-t border-border pt-4">
+                <KeyVal label="Appellate Reviewer" value={appeal.reviewer} />
+                <KeyVal label="Review Date" value={appeal.reviewDate} />
+              </div>
             </div>
+            <DocList title="Appeal Documents" docs={appeal.evidence} />
           </article>
         </div>
       </div>
@@ -208,6 +215,54 @@ function OverviewComparison({ req }: { req: PriorAuthRequest }) {
   )
 }
 
+const docIcon: Record<EvidenceDoc["type"], typeof FileText> = {
+  image: ImageIcon,
+  pdf: FileText,
+  lab: BarChart3,
+}
+
+function DocList({ title, docs }: { title: string; docs: EvidenceDoc[] }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <div className="border-t border-border bg-secondary/20">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between px-5 py-3 text-left transition-colors hover:bg-secondary/40"
+      >
+        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          {title} ({docs.length})
+        </span>
+        <ChevronDown
+          className={cn(
+            "size-4 shrink-0 text-muted-foreground transition-transform",
+            open && "rotate-180",
+          )}
+        />
+      </button>
+      {open && (
+        <ul className="divide-y divide-border border-t border-border bg-card">
+          {docs.map((doc) => {
+            const Icon = docIcon[doc.type]
+            return (
+              <li key={doc.name} className="flex items-center gap-3 px-5 py-3">
+                <Icon className="size-4 shrink-0 text-primary" />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-foreground">{doc.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    Added {doc.added} · {doc.size}
+                  </p>
+                </div>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </div>
+  )
+}
+
 function SectionLabel({
   children,
   className,
@@ -232,37 +287,6 @@ function KeyVal({ label, value }: { label: string; value: string }) {
     <div className="flex items-center justify-between gap-4">
       <span className="text-sm text-muted-foreground">{label}</span>
       <span className="text-right text-sm font-bold text-foreground">{value}</span>
-    </div>
-  )
-}
-
-function DepthRow({
-  label,
-  filled,
-  tone,
-}: {
-  label: string
-  filled: number
-  tone: "primary" | "destructive"
-}) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <span className="text-sm text-muted-foreground">{label}</span>
-      <span className="flex items-center gap-1">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <span
-            key={i}
-            className={cn(
-              "h-1.5 w-6 rounded-full",
-              i < filled
-                ? tone === "primary"
-                  ? "bg-primary"
-                  : "bg-destructive"
-                : "bg-border",
-            )}
-          />
-        ))}
-      </span>
     </div>
   )
 }
@@ -306,39 +330,40 @@ function TreeComparison({ req }: { req: PriorAuthRequest }) {
 
   return (
     <>
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-semibold text-foreground">
-            Original Determination
-          </span>
-          <span className="text-xs italic text-muted-foreground">
-            {req.policyRef} — {req.policyVersion}
-          </span>
-        </div>
-        <div className="flex items-center gap-2 text-sm font-medium text-primary">
-          <Sparkles className="size-4" />
-          New Evidence Integrated
-        </div>
-      </div>
-
-      <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Original */}
-        <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-          {req.criteria.map((c) => (
-            <TreeBlock key={c.id} root={c} variant="original" />
-          ))}
+      <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
+        <div>
+          <div className="mb-3">
+            <h2 className="text-lg font-bold text-foreground">Original Determination</h2>
+            <p className="text-xs text-muted-foreground">
+              {req.policyRef} — {req.policyVersion}
+            </p>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+            {req.criteria.map((c) => (
+              <TreeNode key={c.id} criterion={c} variant="original" depth={0} />
+            ))}
+          </div>
         </div>
 
-        {/* Appeal */}
-        <div className="rounded-xl border-2 border-primary bg-card p-5 shadow-sm">
-          {appeal.criteria.map((c) => (
-            <TreeBlock
-              key={c.id}
-              root={c}
-              variant="appeal"
-              originalMap={originalMap}
-            />
-          ))}
+        <div>
+          <div className="mb-3 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-foreground">Appeal Determination</h2>
+            <span className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+              <Sparkles className="size-3" />
+              New Evidence
+            </span>
+          </div>
+          <div className="rounded-xl border border-l-4 border-l-primary border-border bg-card p-4 shadow-sm">
+            {appeal.criteria.map((c) => (
+              <TreeNode
+                key={c.id}
+                criterion={c}
+                variant="appeal"
+                depth={0}
+                originalMap={originalMap}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
@@ -347,117 +372,157 @@ function TreeComparison({ req }: { req: PriorAuthRequest }) {
   )
 }
 
-function TreeBlock({
-  root,
-  variant,
-  originalMap,
-}: {
-  root: Criterion
-  variant: "original" | "appeal"
-  originalMap?: Map<string, Criterion>
-}) {
-  const rootMet = root.state === "met"
-  return (
-    <div>
-      <div className="flex items-start gap-3">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          <CircleCheck className="size-5" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-bold text-foreground">{root.label}</h3>
-          <p className="text-xs text-muted-foreground">{root.description}</p>
-        </div>
-        {rootMet ? (
-          <CheckCircle2 className="size-5 shrink-0 text-success" />
-        ) : (
-          <XCircle className="size-5 shrink-0 text-destructive" />
-        )}
-      </div>
-
-      <div className="mt-4 space-y-3 border-l-2 border-border pl-4">
-        {root.children?.map((child) => {
-          const original = originalMap?.get(child.id)
-          const flipped =
-            variant === "appeal" &&
-            original &&
-            original.state === "not-met" &&
-            child.state === "met"
-          const unchanged =
-            variant === "appeal" &&
-            original &&
-            original.state === child.state
-          return (
-            <CriterionTile
-              key={child.id}
-              criterion={child}
-              variant={variant}
-              flipped={!!flipped}
-              unchanged={!!unchanged}
-            />
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-function CriterionTile({
+function TreeNode({
   criterion,
   variant,
-  flipped,
-  unchanged,
+  depth,
+  originalMap,
+  isLast = true,
 }: {
   criterion: Criterion
   variant: "original" | "appeal"
-  flipped: boolean
-  unchanged: boolean
+  depth: number
+  originalMap?: Map<string, Criterion>
+  isLast?: boolean
 }) {
+  const [open, setOpen] = useState(depth === 0)
+  const hasChildren = !!criterion.children?.length
+  const isLeaf = !hasChildren
   const met = criterion.state === "met"
+  const isRoot = depth === 0
 
-  // Visual tone
-  const tone = flipped
+  const original = originalMap?.get(criterion.id)
+  const flipped =
+    variant === "appeal" &&
+    !!original &&
+    original.state === "not-met" &&
+    criterion.state === "met"
+  const unchanged =
+    variant === "appeal" && !!original && original.state === criterion.state
+
+  const headerTone = flipped
     ? "border-success/40 bg-success/[0.06]"
-    : !met
+    : !met && !isRoot
       ? "border-destructive/40 bg-destructive/5"
-      : "border-border bg-secondary/30"
+      : isRoot
+        ? "border-border bg-primary/5"
+        : hasChildren
+          ? "border-border bg-secondary/20"
+          : "border-border bg-card"
 
   return (
-    <div className={cn("relative rounded-lg border p-3.5", tone)}>
-      <div className="flex items-start gap-2.5">
-        {met ? (
-          <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-success" />
-        ) : (
-          <XCircle className="mt-0.5 size-4 shrink-0 text-destructive" />
+    <div className={cn(depth > 0 && "relative pt-2")}>
+      {depth > 0 && (
+        <>
+          <span
+            aria-hidden
+            className="absolute left-0 top-0 w-px bg-border"
+            style={{ height: isLast ? "1.25rem" : "100%" }}
+          />
+          <span aria-hidden className="absolute left-0 top-5 h-px w-4 bg-border" />
+        </>
+      )}
+
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className={cn(
+          "relative flex w-full items-start gap-2 rounded-lg border p-3 text-left transition-colors hover:bg-secondary/40",
+          headerTone,
         )}
+      >
+        <ChevronDown
+          className={cn(
+            "mt-0.5 size-4 shrink-0 text-muted-foreground transition-transform",
+            !open && "-rotate-90",
+          )}
+        />
+        <span
+          className={cn(
+            "flex size-7 shrink-0 items-center justify-center rounded-md text-xs font-bold",
+            isRoot ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground",
+          )}
+        >
+          {criterion.id}
+        </span>
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-start justify-between gap-2">
+          <div className="flex items-start justify-between gap-2">
             <h4
               className={cn(
-                "text-sm font-bold",
-                !met && variant === "original"
-                  ? "text-destructive"
-                  : "text-foreground",
+                "text-sm font-bold text-foreground",
+                !met && variant === "original" && !hasChildren && "text-destructive",
               )}
             >
               {criterion.label}
             </h4>
-            <ChangeBadge
-              variant={variant}
-              met={met}
-              flipped={flipped}
-              unchanged={unchanged}
-            />
+            <div className="flex shrink-0 items-center gap-2">
+              {!isRoot && (
+                <ChangeBadge
+                  variant={variant}
+                  met={met}
+                  flipped={flipped}
+                  unchanged={unchanged}
+                />
+              )}
+              {isRoot &&
+                (met ? (
+                  <CheckCircle2 className="size-4 text-success" />
+                ) : (
+                  <XCircle className="size-4 text-destructive" />
+                ))}
+            </div>
           </div>
-          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            {variant === "appeal" ? criterion.description : criterion.evidence}
-          </p>
-          {variant === "appeal" && flipped && (
-            <p className="mt-2 rounded-md bg-card px-2.5 py-1.5 text-xs italic text-muted-foreground">
-              {criterion.evidence}
+          {!open && (
+            <p className="mt-1 text-xs font-medium text-primary">
+              {hasChildren
+                ? `${criterion.children!.length} sub-criteria — click to expand`
+                : "Click to view details"}
+            </p>
+          )}
+          {open && !hasChildren && (
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              {criterion.description}
+            </p>
+          )}
+          {open && hasChildren && (
+            <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+              {criterion.description}
             </p>
           )}
         </div>
-      </div>
+      </button>
+
+      {open && hasChildren && (
+        <ul className="relative ml-4 mt-1 space-y-0 pl-4">
+          {criterion.children!.map((child, index) => (
+            <li key={child.id} className="relative">
+              <TreeNode
+                criterion={child}
+                variant={variant}
+                depth={depth + 1}
+                originalMap={originalMap}
+                isLast={index === criterion.children!.length - 1}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {open && isLeaf && (
+        <div
+          className={cn(
+            "ml-11 mt-1 rounded-md border border-border bg-secondary/20 px-3 py-2.5",
+            flipped && "border-success/30 bg-success/[0.04]",
+            !met && variant === "original" && "border-destructive/30 bg-destructive/[0.04]",
+          )}
+        >
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Evidence
+          </p>
+          <p className="mt-1 text-xs leading-relaxed text-foreground">{criterion.evidence}</p>
+        </div>
+      )}
     </div>
   )
 }

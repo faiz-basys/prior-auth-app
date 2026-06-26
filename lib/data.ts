@@ -27,6 +27,7 @@ export interface EvidenceDoc {
   added: string
   size: string
   type: "image" | "pdf" | "lab"
+  preview?: string
 }
 
 export interface AppealDetermination {
@@ -37,6 +38,7 @@ export interface AppealDetermination {
   recommendation: string
   rationale: string
   evidenceDepth: number
+  evidence: EvidenceDoc[]
   criteria: Criterion[]
 }
 
@@ -123,10 +125,38 @@ export const requests: PriorAuthRequest[] = [
       "Lumbar Fusion Coverage Guideline for surgical intervention and conservative management requirements.",
     policyVersion: "v1.0 Last Update: Oct 12, 2023",
     evidence: [
-      { name: "MRI_Lumbar_Spine_0823.png", added: "Oct 24", size: "12.4 MB", type: "image" },
-      { name: "Clinical_Notes_PCP.pdf", added: "Oct 24", size: "2.1 MB", type: "pdf" },
-      { name: "PT_Records_V2.pdf", added: "Oct 22", size: "4.5 MB", type: "pdf" },
-      { name: "Lab_Results_Metabolic.pdf", added: "Oct 20", size: "0.8 MB", type: "lab" },
+      {
+        name: "MRI_Lumbar_Spine_0823.png",
+        added: "Oct 24",
+        size: "12.4 MB",
+        type: "image",
+        preview:
+          "MRI Lumbar Spine — Aug 15, 2023\n\nFindings: Grade II spondylolisthesis at L4-L5 with moderate foraminal narrowing. Mild degenerative disc changes at L3-L4. No acute fracture or cord compression.\n\nImpression: Radiographic findings correlate with reported radicular symptoms.",
+      },
+      {
+        name: "Clinical_Notes_PCP.pdf",
+        added: "Oct 24",
+        size: "2.1 MB",
+        type: "pdf",
+        preview:
+          "Primary Care Visit — Oct 02, 2023\n\nPatient reports persistent low back pain radiating to left leg despite 6 weeks of physical therapy. Active smoker. Referred to orthopedics for surgical evaluation.\n\nAssessment: Lumbar spondylolisthesis, chronic low back pain with radiculopathy.",
+      },
+      {
+        name: "PT_Records_V2.pdf",
+        added: "Oct 22",
+        size: "4.5 MB",
+        type: "pdf",
+        preview:
+          "Physical Therapy Summary — Jun 2023 to Aug 2023\n\nTotal sessions: 12 over 6 weeks\nFocus: Core stabilization, lumbar flexion/extension\n\nNote: Records confirm 6 weeks of PT only. No documentation of epidural steroid injection or extended conservative trial.",
+      },
+      {
+        name: "Lab_Results_Metabolic.pdf",
+        added: "Oct 20",
+        size: "0.8 MB",
+        type: "lab",
+        preview:
+          "Metabolic Panel — Oct 18, 2023\n\nAll values within normal limits. Pre-operative labs cleared for surgical planning.",
+      },
     ],
     patient: {
       name: "Jonathan Miller",
@@ -162,6 +192,22 @@ export const requests: PriorAuthRequest[] = [
             description: "Confirmed radiographic diagnosis grade II or higher.",
             state: "met",
             evidence: "Imaging confirmed Aug 2023.",
+            children: [
+              {
+                id: "A.1.1",
+                label: "Radiographic Grade II+",
+                description: "Spondylolisthesis grade II or higher on imaging.",
+                state: "met",
+                evidence: "MRI Aug 2023 confirms grade II at L4-L5.",
+              },
+              {
+                id: "A.1.2",
+                label: "Clinical Symptom Correlation",
+                description: "Symptoms consistent with diagnosed condition.",
+                state: "met",
+                evidence: "Radicular leg pain documented in chart.",
+              },
+            ],
           },
           {
             id: "A.2",
@@ -171,6 +217,29 @@ export const requests: PriorAuthRequest[] = [
             state: "not-met",
             evidence:
               "Only 3 months of physical therapy documented in initial submission. No record of epidural steroid injections.",
+            children: [
+              {
+                id: "A.2.1",
+                label: "Physical Therapy (6 months)",
+                description: "Minimum 6 months of structured physical therapy.",
+                state: "not-met",
+                evidence: "Only 3 months of PT documented in initial submission.",
+              },
+              {
+                id: "A.2.2",
+                label: "Epidural Steroid Injection",
+                description: "Trial of ESI unless contraindicated.",
+                state: "not-met",
+                evidence: "No record of epidural steroid injections.",
+              },
+              {
+                id: "A.2.3",
+                label: "Pharmacologic Management",
+                description: "Documented trial of NSAIDs or analgesics.",
+                state: "met",
+                evidence: "NSAID use noted in clinical notes.",
+              },
+            ],
           },
           {
             id: "A.3",
@@ -178,6 +247,22 @@ export const requests: PriorAuthRequest[] = [
             description: "Radiographic findings correlate with clinical diagnosis.",
             state: "met",
             evidence: "MRI correlates with reported symptoms.",
+            children: [
+              {
+                id: "A.3.1",
+                label: "MRI Findings Match Diagnosis",
+                description: "Imaging supports the stated diagnosis.",
+                state: "met",
+                evidence: "MRI findings consistent with spondylolisthesis.",
+              },
+              {
+                id: "A.3.2",
+                label: "Symptom Correlation Documented",
+                description: "Clinical symptoms align with imaging.",
+                state: "met",
+                evidence: "Radicular symptoms correlate with L4-L5 level.",
+              },
+            ],
           },
         ],
       },
@@ -197,6 +282,56 @@ export const requests: PriorAuthRequest[] = [
       rationale:
         "Appeal submission includes detailed physical therapy logs (Oct–Jan) and pharmacy records confirming completed conservative management. Supplemental records (Exhibits B–D) and an ESI on Feb 10 satisfy the previously unmet criterion. The clinical necessity is now clearly established through the newly verified documentation of failed conservative treatment and radiographic progression.",
       evidenceDepth: 3,
+      evidence: [
+        {
+          name: "Appeal_Letter_PA-902341.pdf",
+          added: "Oct 28",
+          size: "0.4 MB",
+          type: "pdf",
+          preview:
+            "Formal Appeal Letter — Oct 28, 2023\n\nRe: Case PA-902341 — Jonathan Miller\n\nWe respectfully appeal the denial dated Mar 12, 2023 for lumbar spinal fusion (CPT 22612).\n\nThe initial determination cited incomplete conservative therapy. Enclosed supplemental documentation demonstrates 16 weeks of physical therapy (Oct 2022–Jan 2023), pharmacy records confirming NSAID regimen, and epidural steroid injection on Feb 10, 2023.\n\nWe request reconsideration based on the attached exhibits.\n\nSigned,\nDr. Aris Thompson, MD\nOrthopedic Surgery",
+        },
+        {
+          name: "Letter_of_Medical_Necessity.pdf",
+          added: "Oct 28",
+          size: "0.6 MB",
+          type: "pdf",
+          preview:
+            "Letter of Medical Necessity\n\nPatient has failed conservative management including structured PT, pharmacologic therapy, and ESI. Persistent radiculopathy with imaging-confirmed grade II spondylolisthesis. Lumbar fusion is medically necessary to restore function and prevent neurologic progression.\n\nDr. Aris Thompson, MD",
+        },
+        {
+          name: "PT_Logs_Oct-Jan.pdf",
+          added: "Nov 01",
+          size: "3.2 MB",
+          type: "pdf",
+          preview:
+            "Physical Therapy Logs — Oct 2022 to Jan 2023\n\n32 sessions documented across 16 weeks.\nModalities: Manual therapy, McKenzie protocol, core strengthening.\n\nPatient completed full course with documented functional improvement plateau and persistent symptoms warranting surgical referral.",
+        },
+        {
+          name: "Pharmacy_Records.pdf",
+          added: "Nov 01",
+          size: "1.1 MB",
+          type: "pdf",
+          preview:
+            "Pharmacy Dispense History — Aug 2022 to Feb 2023\n\nIbuprofen 800mg — 90-day supply, refilled x3\nMeloxicam 15mg — 30-day supply x2\n\nConfirms ongoing pharmacologic conservative management during PT trial.",
+        },
+        {
+          name: "Exhibit_B_ESI_Report.pdf",
+          added: "Nov 01",
+          size: "0.9 MB",
+          type: "pdf",
+          preview:
+            "Epidural Steroid Injection Report — Feb 10, 2023\n\nProcedure: L4-L5 transforaminal ESI\nOutcome: Temporary relief (2 weeks), symptoms returned.\n\nDocuments interventional conservative therapy prior to fusion request.",
+        },
+        {
+          name: "Dr_Aris_Supplemental_Record.pdf",
+          added: "Nov 02",
+          size: "5.4 MB",
+          type: "pdf",
+          preview:
+            "Supplemental Medical Record Export — System ID: 99102-B\n\nConsolidated chart notes, operative planning assessment, and updated imaging review confirming progression since initial submission.\n\nSupports appeal that all CMS-L33747 conservative therapy requirements are now satisfied.",
+        },
+      ],
       criteria: [
         {
           id: "A",
@@ -210,7 +345,23 @@ export const requests: PriorAuthRequest[] = [
               label: "Diagnosis: Spondylolisthesis",
               description: "Confirmed radiographic diagnosis grade II or higher.",
               state: "met",
-              evidence: "Unchanged.",
+              evidence: "Unchanged from original determination.",
+              children: [
+                {
+                  id: "A.1.1",
+                  label: "Radiographic Grade II+",
+                  description: "Spondylolisthesis grade II or higher on imaging.",
+                  state: "met",
+                  evidence: "Unchanged.",
+                },
+                {
+                  id: "A.1.2",
+                  label: "Clinical Symptom Correlation",
+                  description: "Symptoms consistent with diagnosed condition.",
+                  state: "met",
+                  evidence: "Unchanged.",
+                },
+              ],
             },
             {
               id: "A.2",
@@ -219,13 +370,52 @@ export const requests: PriorAuthRequest[] = [
                 "Supplemental records (Exhibits B-D) show prior PT from Oct-Jan and ESI on Feb 10. Criteria now satisfied.",
               state: "met",
               evidence: "Evidence Source: Dr. Aris Med Record (System ID: 99102-B)",
+              children: [
+                {
+                  id: "A.2.1",
+                  label: "Physical Therapy (6 months)",
+                  description: "Minimum 6 months of structured physical therapy.",
+                  state: "met",
+                  evidence: "PT logs Oct–Jan confirm 16 weeks of therapy (Exhibit A).",
+                },
+                {
+                  id: "A.2.2",
+                  label: "Epidural Steroid Injection",
+                  description: "Trial of ESI unless contraindicated.",
+                  state: "met",
+                  evidence: "ESI performed Feb 10, 2023 (Exhibit B).",
+                },
+                {
+                  id: "A.2.3",
+                  label: "Pharmacologic Management",
+                  description: "Documented trial of NSAIDs or analgesics.",
+                  state: "met",
+                  evidence: "Pharmacy records confirm NSAID regimen (Exhibit C).",
+                },
+              ],
             },
             {
               id: "A.3",
               label: "Imaging Correlation",
               description: "Radiographic findings correlate with clinical diagnosis.",
               state: "met",
-              evidence: "Unchanged.",
+              evidence: "Unchanged from original determination.",
+              children: [
+                {
+                  id: "A.3.1",
+                  label: "MRI Findings Match Diagnosis",
+                  description: "Imaging supports the stated diagnosis.",
+                  state: "met",
+                  evidence: "Unchanged.",
+                },
+                {
+                  id: "A.3.2",
+                  label: "Symptom Correlation Documented",
+                  description: "Clinical symptoms align with imaging.",
+                  state: "met",
+                  evidence: "Unchanged.",
+                },
+              ],
             },
           ],
         },
