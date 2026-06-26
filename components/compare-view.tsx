@@ -201,13 +201,13 @@ function OverviewComparison({ req }: { req: PriorAuthRequest }) {
           </div>
         </article>
 
-        <article className="flex flex-col items-center justify-center rounded-xl border border-border bg-card p-5 text-center shadow-sm">
+        {/* <article className="flex flex-col items-center justify-center rounded-xl border border-border bg-card p-5 text-center shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Final Confidence Score
           </p>
           <ConfidenceRing value={92} />
           <p className="text-sm font-semibold text-primary">High Assurance Level</p>
-        </article>
+        </article> */}
       </div>
 
       <FooterActions />
@@ -584,10 +584,10 @@ function FooterActions() {
           <FileDown className="size-4" />
           Export Logic Comparison
         </Button>
-        <button className="inline-flex h-9 items-center gap-2 rounded-lg bg-foreground px-5 text-sm font-semibold text-background transition-opacity hover:opacity-90">
+        <Button size="lg">
           <CheckCircle className="size-4" />
           Finalize Appeal Decision
-        </button>
+        </Button>
       </div>
     </div>
   )
