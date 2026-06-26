@@ -53,12 +53,12 @@ export default async function RequestDetailPage({
         <span className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">
           Request Detail
         </span>
-        <Link
+        {/* <Link
           href={`/requests/${req.id}/clinical-logic`}
           className="rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
         >
           Clinical Logic / Decision Tree
-        </Link>
+        </Link> */}
         <Link
           href={`/requests/${req.id}/compare`}
           className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"

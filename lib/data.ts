@@ -22,12 +22,17 @@ export interface RationaleItem {
   reference?: string
 }
 
+export type DocChange = "new" | "updated" | "unchanged" | "insufficient"
+
 export interface EvidenceDoc {
   name: string
   added: string
   size: string
   type: "image" | "pdf" | "lab"
   preview?: string
+  change?: DocChange
+  changeNote?: string
+  relatedDoc?: string
 }
 
 export interface AppealDetermination {
@@ -130,6 +135,8 @@ export const requests: PriorAuthRequest[] = [
         added: "Oct 24",
         size: "12.4 MB",
         type: "image",
+        change: "unchanged",
+        changeNote: "Same imaging referenced in appeal.",
         preview:
           "MRI Lumbar Spine — Aug 15, 2023\n\nFindings: Grade II spondylolisthesis at L4-L5 with moderate foraminal narrowing. Mild degenerative disc changes at L3-L4. No acute fracture or cord compression.\n\nImpression: Radiographic findings correlate with reported radicular symptoms.",
       },
@@ -138,6 +145,8 @@ export const requests: PriorAuthRequest[] = [
         added: "Oct 24",
         size: "2.1 MB",
         type: "pdf",
+        change: "unchanged",
+        changeNote: "No changes in appeal submission.",
         preview:
           "Primary Care Visit — Oct 02, 2023\n\nPatient reports persistent low back pain radiating to left leg despite 6 weeks of physical therapy. Active smoker. Referred to orthopedics for surgical evaluation.\n\nAssessment: Lumbar spondylolisthesis, chronic low back pain with radiculopathy.",
       },
@@ -146,6 +155,9 @@ export const requests: PriorAuthRequest[] = [
         added: "Oct 22",
         size: "4.5 MB",
         type: "pdf",
+        change: "insufficient",
+        changeNote: "Only 6 weeks of PT documented — gap filled by appeal PT logs.",
+        relatedDoc: "PT_Logs_Oct-Jan.pdf",
         preview:
           "Physical Therapy Summary — Jun 2023 to Aug 2023\n\nTotal sessions: 12 over 6 weeks\nFocus: Core stabilization, lumbar flexion/extension\n\nNote: Records confirm 6 weeks of PT only. No documentation of epidural steroid injection or extended conservative trial.",
       },
@@ -154,6 +166,8 @@ export const requests: PriorAuthRequest[] = [
         added: "Oct 20",
         size: "0.8 MB",
         type: "lab",
+        change: "unchanged",
+        changeNote: "No changes in appeal submission.",
         preview:
           "Metabolic Panel — Oct 18, 2023\n\nAll values within normal limits. Pre-operative labs cleared for surgical planning.",
       },
@@ -288,6 +302,8 @@ export const requests: PriorAuthRequest[] = [
           added: "Oct 28",
           size: "0.4 MB",
           type: "pdf",
+          change: "new",
+          changeNote: "Formal appeal letter — not in original submission.",
           preview:
             "Formal Appeal Letter — Oct 28, 2023\n\nRe: Case PA-902341 — Jonathan Miller\n\nWe respectfully appeal the denial dated Mar 12, 2023 for lumbar spinal fusion (CPT 22612).\n\nThe initial determination cited incomplete conservative therapy. Enclosed supplemental documentation demonstrates 16 weeks of physical therapy (Oct 2022–Jan 2023), pharmacy records confirming NSAID regimen, and epidural steroid injection on Feb 10, 2023.\n\nWe request reconsideration based on the attached exhibits.\n\nSigned,\nDr. Aris Thompson, MD\nOrthopedic Surgery",
         },
@@ -296,6 +312,8 @@ export const requests: PriorAuthRequest[] = [
           added: "Oct 28",
           size: "0.6 MB",
           type: "pdf",
+          change: "new",
+          changeNote: "Supporting letter — not in original submission.",
           preview:
             "Letter of Medical Necessity\n\nPatient has failed conservative management including structured PT, pharmacologic therapy, and ESI. Persistent radiculopathy with imaging-confirmed grade II spondylolisthesis. Lumbar fusion is medically necessary to restore function and prevent neurologic progression.\n\nDr. Aris Thompson, MD",
         },
@@ -304,6 +322,9 @@ export const requests: PriorAuthRequest[] = [
           added: "Nov 01",
           size: "3.2 MB",
           type: "pdf",
+          change: "updated",
+          changeNote: "Full 16-week PT logs — supersedes incomplete PT_Records_V2.pdf.",
+          relatedDoc: "PT_Records_V2.pdf",
           preview:
             "Physical Therapy Logs — Oct 2022 to Jan 2023\n\n32 sessions documented across 16 weeks.\nModalities: Manual therapy, McKenzie protocol, core strengthening.\n\nPatient completed full course with documented functional improvement plateau and persistent symptoms warranting surgical referral.",
         },
@@ -312,6 +333,8 @@ export const requests: PriorAuthRequest[] = [
           added: "Nov 01",
           size: "1.1 MB",
           type: "pdf",
+          change: "new",
+          changeNote: "Pharmacy history — not in original submission.",
           preview:
             "Pharmacy Dispense History — Aug 2022 to Feb 2023\n\nIbuprofen 800mg — 90-day supply, refilled x3\nMeloxicam 15mg — 30-day supply x2\n\nConfirms ongoing pharmacologic conservative management during PT trial.",
         },
@@ -320,6 +343,8 @@ export const requests: PriorAuthRequest[] = [
           added: "Nov 01",
           size: "0.9 MB",
           type: "pdf",
+          change: "new",
+          changeNote: "ESI documentation — missing from original submission.",
           preview:
             "Epidural Steroid Injection Report — Feb 10, 2023\n\nProcedure: L4-L5 transforaminal ESI\nOutcome: Temporary relief (2 weeks), symptoms returned.\n\nDocuments interventional conservative therapy prior to fusion request.",
         },
@@ -328,6 +353,8 @@ export const requests: PriorAuthRequest[] = [
           added: "Nov 02",
           size: "5.4 MB",
           type: "pdf",
+          change: "new",
+          changeNote: "Consolidated supplemental chart export.",
           preview:
             "Supplemental Medical Record Export — System ID: 99102-B\n\nConsolidated chart notes, operative planning assessment, and updated imaging review confirming progression since initial submission.\n\nSupports appeal that all CMS-L33747 conservative therapy requirements are now satisfied.",
         },

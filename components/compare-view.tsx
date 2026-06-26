@@ -15,7 +15,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import type { Criterion, EvidenceDoc, PriorAuthRequest } from "@/lib/data"
+import type { Criterion, DocChange, EvidenceDoc, PriorAuthRequest } from "@/lib/data"
 
 type Mode = "overview" | "tree"
 
@@ -146,7 +146,7 @@ function OverviewComparison({ req }: { req: PriorAuthRequest }) {
                 <KeyVal label="Review Date" value="Oct 12, 2023" />
               </div>
             </div>
-            <DocList title="Patient Charts" docs={req.evidence} />
+            <DocList title="Patient Charts" docs={req.evidence} side="original" />
           </article>
         </div>
 
@@ -173,7 +173,7 @@ function OverviewComparison({ req }: { req: PriorAuthRequest }) {
                 <KeyVal label="Review Date" value={appeal.reviewDate} />
               </div>
             </div>
-            <DocList title="Appeal Documents" docs={appeal.evidence} />
+            <DocList title="Appeal Documents" docs={appeal.evidence} side="appeal" />
           </article>
         </div>
       </div>
@@ -221,8 +221,45 @@ const docIcon: Record<EvidenceDoc["type"], typeof FileText> = {
   lab: BarChart3,
 }
 
-function DocList({ title, docs }: { title: string; docs: EvidenceDoc[] }) {
+const docChangeStyles: Record<
+  DocChange,
+  { row: string; badge: string; label: string }
+> = {
+  new: {
+    row: "border-l-[3px] border-l-success bg-success/[0.06]",
+    badge: "bg-success/12 text-success",
+    label: "New",
+  },
+  updated: {
+    row: "border-l-[3px] border-l-warning bg-warning/10",
+    badge: "bg-warning/15 text-warning",
+    label: "Updated",
+  },
+  insufficient: {
+    row: "border-l-[3px] border-l-destructive bg-destructive/5",
+    badge: "bg-destructive/10 text-destructive",
+    label: "Gap",
+  },
+  unchanged: {
+    row: "",
+    badge: "bg-muted text-muted-foreground",
+    label: "On File",
+  },
+}
+
+function DocList({
+  title,
+  docs,
+  side,
+}: {
+  title: string
+  docs: EvidenceDoc[]
+  side: "original" | "appeal"
+}) {
   const [open, setOpen] = useState(false)
+  const changedCount = docs.filter(
+    (d) => d.change && d.change !== "unchanged",
+  ).length
 
   return (
     <div className="border-t border-border bg-secondary/20">
@@ -231,9 +268,25 @@ function DocList({ title, docs }: { title: string; docs: EvidenceDoc[] }) {
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center justify-between px-5 py-3 text-left transition-colors hover:bg-secondary/40"
       >
-        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          {title} ({docs.length})
-        </span>
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            {title} ({docs.length})
+          </span>
+          {changedCount > 0 && (
+            <span
+              className={cn(
+                "rounded px-1.5 py-0.5 text-[10px] font-bold uppercase",
+                side === "appeal"
+                  ? "bg-success/12 text-success"
+                  : "bg-destructive/10 text-destructive",
+              )}
+            >
+              {side === "appeal"
+                ? `${changedCount} new/updated`
+                : `${changedCount} gap${changedCount > 1 ? "s" : ""}`}
+            </span>
+          )}
+        </div>
         <ChevronDown
           className={cn(
             "size-4 shrink-0 text-muted-foreground transition-transform",
@@ -245,14 +298,51 @@ function DocList({ title, docs }: { title: string; docs: EvidenceDoc[] }) {
         <ul className="divide-y divide-border border-t border-border bg-card">
           {docs.map((doc) => {
             const Icon = docIcon[doc.type]
+            const change = doc.change ?? "unchanged"
+            const styles = docChangeStyles[change]
             return (
-              <li key={doc.name} className="flex items-center gap-3 px-5 py-3">
-                <Icon className="size-4 shrink-0 text-primary" />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-foreground">{doc.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    Added {doc.added} · {doc.size}
-                  </p>
+              <li
+                key={doc.name}
+                className={cn("px-5 py-3", styles.row)}
+              >
+                <div className="flex items-start gap-3">
+                  <Icon className="mt-0.5 size-4 shrink-0 text-primary" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="truncate text-sm font-medium text-foreground">
+                        {doc.name}
+                      </p>
+                      {doc.change && (
+                        <span
+                          className={cn(
+                            "shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase",
+                            styles.badge,
+                          )}
+                        >
+                          {styles.label}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Added {doc.added} · {doc.size}
+                    </p>
+                    {doc.changeNote && (
+                      <p
+                        className={cn(
+                          "mt-1 text-xs leading-relaxed",
+                          change === "new" && "text-success",
+                          change === "updated" && "text-warning",
+                          change === "insufficient" && "text-destructive",
+                          change === "unchanged" && "text-muted-foreground",
+                        )}
+                      >
+                        {doc.changeNote}
+                        {doc.relatedDoc && (
+                          <span className="font-medium"> → {doc.relatedDoc}</span>
+                        )}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </li>
             )
