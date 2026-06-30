@@ -52,6 +52,29 @@ export interface EvidenceDoc {
     relatedDoc?: string;
 }
 
+export function getRequiredDocumentation(
+    caseId: string,
+    submitted?: string,
+): EvidenceDoc[] {
+    const added = submitted?.split(" · ")[0] ?? "On file";
+    return [
+        {
+            name: "Cover Sheet",
+            added,
+            size: "0.2 MB",
+            type: "pdf",
+            changeNote: `Cover_Sheet_${caseId}.pdf`,
+        },
+        {
+            name: "Medical Chart",
+            added,
+            size: "4.8 MB",
+            type: "pdf",
+            changeNote: `Medical_Chart_${caseId}.pdf`,
+        },
+    ];
+}
+
 export interface AppealDetermination {
     decision: RequestStatus;
     decisionDate: string;
@@ -110,8 +133,8 @@ export interface AppealRequest {
 
 export const appealsData: Omit<AppealRequest, "cycles" | "events">[] = [
     {
-        id: "pa-902341",
-        caseId: "PA-902341",
+        id: "ag-902341",
+        caseId: "AG-902341",
         procedure: "Lumbar Spinal Fusion",
         procedureCode: "CPT 22612",
         policyName: "L33747 — Lumbar Fusion (CMS LCD)",
@@ -338,7 +361,7 @@ export const appealsData: Omit<AppealRequest, "cycles" | "events">[] = [
             evidenceDepth: 3,
             evidence: [
                 {
-                    name: "Appeal_Letter_PA-902341.pdf",
+                    name: "Appeal_Letter_AG-902341.pdf",
                     added: "Oct 28",
                     size: "0.4 MB",
                     type: "pdf",
@@ -346,7 +369,7 @@ export const appealsData: Omit<AppealRequest, "cycles" | "events">[] = [
                     changeNote:
                         "Formal appeal letter — not in original submission.",
                     preview:
-                        "Formal Appeal Letter — Oct 28, 2023\n\nRe: Case PA-902341 — Jonathan Miller\n\nWe respectfully appeal the denial dated Mar 12, 2023 for lumbar spinal fusion (CPT 22612).\n\nThe initial determination cited incomplete conservative therapy. Enclosed supplemental documentation demonstrates 16 weeks of physical therapy (Oct 2022–Jan 2023), pharmacy records confirming NSAID regimen, and epidural steroid injection on Feb 10, 2023.\n\nWe request reconsideration based on the attached exhibits.\n\nSigned,\nDr. Aris Thompson, MD\nOrthopedic Surgery",
+                        "Formal Appeal Letter — Oct 28, 2023\n\nRe: Case AG-902341 — Jonathan Miller\n\nWe respectfully appeal the denial dated Mar 12, 2023 for lumbar spinal fusion (CPT 22612).\n\nThe initial determination cited incomplete conservative therapy. Enclosed supplemental documentation demonstrates 16 weeks of physical therapy (Oct 2022–Jan 2023), pharmacy records confirming NSAID regimen, and epidural steroid injection on Feb 10, 2023.\n\nWe request reconsideration based on the attached exhibits.\n\nSigned,\nDr. Aris Thompson, MD\nOrthopedic Surgery",
                 },
                 {
                     name: "Letter_of_Medical_Necessity.pdf",
@@ -509,8 +532,8 @@ export const appealsData: Omit<AppealRequest, "cycles" | "events">[] = [
         },
     },
     {
-        id: "pa-882193",
-        caseId: "PA-882193",
+        id: "ag-882193",
+        caseId: "AG-882193",
         procedure: "Mavacamten (Camzyos)",
         procedureCode: "J-Code J8499",
         drug: "Mavacamten (Camzyos)",
@@ -659,7 +682,7 @@ export const appealsData: Omit<AppealRequest, "cycles" | "events">[] = [
             evidenceDepth: 2,
             evidence: [
                 {
-                    name: "Appeal_Letter_PA-882193.pdf",
+                    name: "Appeal_Letter_AG-882193.pdf",
                     added: "Nov 02",
                     size: "0.3 MB",
                     type: "pdf",
@@ -737,8 +760,8 @@ export const appealsData: Omit<AppealRequest, "cycles" | "events">[] = [
         },
     },
     {
-        id: "pa-771045",
-        caseId: "PA-771045",
+        id: "ag-771045",
+        caseId: "AG-771045",
         procedure: "Rituxan (Rituximab)",
         procedureCode: "J-Code J9312",
         drug: "Rituxan, Truxima, Ruxience, Riabni",
@@ -876,7 +899,7 @@ export const appealsData: Omit<AppealRequest, "cycles" | "events">[] = [
             evidenceDepth: 2,
             evidence: [
                 {
-                    name: "Appeal_Letter_PA-771045.pdf",
+                    name: "Appeal_Letter_AG-771045.pdf",
                     added: "Nov 05",
                     size: "0.4 MB",
                     type: "pdf",
@@ -961,8 +984,8 @@ export const appealsData: Omit<AppealRequest, "cycles" | "events">[] = [
         },
     },
     {
-        id: "pa-664821",
-        caseId: "PA-664821",
+        id: "ag-664821",
+        caseId: "AG-664821",
         procedure: "Dupixent (Dupilumab)",
         procedureCode: "J-Code J3590",
         drug: "Dupixent",
@@ -1047,8 +1070,8 @@ export const appealsData: Omit<AppealRequest, "cycles" | "events">[] = [
         ],
     },
     {
-        id: "pa-558902",
-        caseId: "PA-558902",
+        id: "ag-558902",
+        caseId: "AG-558902",
         procedure: "Spinal Cord Stimulator Trial",
         procedureCode: "CPT 63650",
         policyName: "NEURO-2022-15 — Spinal Cord Stimulation",
@@ -1060,11 +1083,11 @@ export const appealsData: Omit<AppealRequest, "cycles" | "events">[] = [
         originalReviewDate: "Nov 01, 2023",
         appealOutcomeLabel: "Appeal · RFI sent",
         confidence: 52,
-        recommendationVerdict: "PENDING",
+        recommendationVerdict: "NOT APPROVE",
         recommendation:
-            "Appeal is on hold pending functional assessment and pain diary. Cannot confirm 50% pain reduction threshold without 4-week documented diary.",
+            "Deny SCS trial. Required 4-week pain diary not submitted — cannot confirm chronic intractable pain severity threshold.",
         checks: [
-            { label: "Medical Necessity", sublabel: "Pending", passed: null },
+            { label: "Medical Necessity", sublabel: "Failed", passed: false },
             { label: "Plan Eligibility", sublabel: "Verified", passed: true },
             { label: "Provider Network", sublabel: "In-Network", passed: true },
         ],
@@ -1144,26 +1167,38 @@ export const appealsData: Omit<AppealRequest, "cycles" | "events">[] = [
         },
     },
     {
-        id: "pa-441203",
-        caseId: "PA-441203",
+        id: "ag-441203",
+        caseId: "AG-441203",
         procedure: "MRI Knee (Right)",
         procedureCode: "CPT 73721",
         policyName: "RAD-2023-02 — Advanced Imaging",
         payerName: "UnitedHealthcare",
-        status: "Pending",
-        lastUpdated: "Nov 25, 2023 · 08:00 AM",
+        status: "In Review",
+        lastUpdated: "Nov 26, 2023 · 02:15 PM",
         submitted: "Nov 25, 2023 · 08:00 AM",
-        appealOutcomeLabel: "Appeal · Awaiting triage",
-        confidence: 0,
-        recommendationVerdict: "PENDING",
+        denialDate: "Nov 20",
+        originalReviewDate: "Nov 20, 2023",
+        appealOutcomeLabel: "Appeal · Uphold expected",
+        confidence: 71,
+        recommendationVerdict: "NOT APPROVE",
         recommendation:
-            "Appeal received and queued for clinical review. AI recommendation will generate after initial document intake.",
+            "Deny coverage. Orthopedic documentation confirms only 10 days of conservative care — policy RAD-2023-02 requires minimum 4 weeks before advanced knee MRI.",
         checks: [
-            { label: "Medical Necessity", sublabel: "Pending", passed: null },
-            { label: "Plan Eligibility", sublabel: "Pending", passed: null },
-            { label: "Provider Network", sublabel: "Pending", passed: null },
+            { label: "Medical Necessity", sublabel: "Failed", passed: false },
+            { label: "Plan Eligibility", sublabel: "Verified", passed: true },
+            { label: "Provider Network", sublabel: "In-Network", passed: true },
         ],
-        rationale: [],
+        rationale: [
+            {
+                title: "Insufficient Conservative Management",
+                detail: "Ortho_Clinic_Note.pdf documents home exercise for 10 days only. RAD-2023-02 requires at least 4 weeks of structured conservative therapy before MRI authorization.",
+                reference: "Ortho_Clinic_Note.pdf",
+            },
+            {
+                title: "Prior Imaging Not Documented",
+                detail: "No weight-bearing knee X-ray within the prior 6 months was found in the appeal package, leaving criterion A.1 unevaluated.",
+            },
+        ],
         policyCodes: ["CPT 73721", "ICD-10 M23.51"],
         policyFile: "RAD-2023-02_Advanced_Imaging.pdf",
         policyRef: "Policy #RAD-2023-02",
@@ -1172,7 +1207,7 @@ export const appealsData: Omit<AppealRequest, "cycles" | "events">[] = [
         policyVersion: "v1.1 Last Update: Jul 20, 2023",
         evidence: [
             {
-                name: "Appeal_Letter_PA-441203.pdf",
+                name: "Appeal_Letter_AG-441203.pdf",
                 added: "Nov 25",
                 size: "0.3 MB",
                 type: "pdf",
@@ -1201,20 +1236,43 @@ export const appealsData: Omit<AppealRequest, "cycles" | "events">[] = [
             npi: "1748293012",
         },
         reviewer: {
-            name: "Unassigned",
-            org: "QMRU Queue",
-            email: "qmru@revieworg.com",
+            name: "Karen Highland",
+            org: "Reviewer Organization B",
+            email: "k.highland@revieworg.com",
         },
         requestingMd: "Dr. Kevin Park, MD",
         criteria: [
             {
                 id: "A",
-                label: "Knee MRI Indications",
-                description: "Clinical criteria pending AI evaluation.",
-                state: "not-found",
-                evidence: "Awaiting review.",
+                label: "Knee MRI clinical indications",
+                description:
+                    "Advanced imaging criteria for musculoskeletal knee evaluation.",
+                state: "not-met",
+                evidence: "Conservative care and prior imaging requirements not met.",
+                children: [
+                    {
+                        id: "A.1",
+                        label: "Prior weight-bearing X-ray",
+                        description:
+                            "Knee X-ray within 6 months before MRI request.",
+                        state: "not-found",
+                        evidence: "None",
+                    },
+                    {
+                        id: "A.2",
+                        label: "Failed conservative management",
+                        description:
+                            "Minimum 4 weeks structured conservative therapy.",
+                        state: "not-met",
+                        evidence: "Only 10 days home exercise documented.",
+                    },
+                ],
             },
         ],
+        determinationIssue: {
+            requirement: "A.2 (Failed Conservative Management)",
+            detail: "has not been satisfied — only 10 days of conservative care documented.",
+        },
     },
 ];
 

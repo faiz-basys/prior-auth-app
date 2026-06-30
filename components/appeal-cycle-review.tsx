@@ -1,25 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { FileText, ImageIcon, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DecisionTreeView } from "@/components/decision-tree-view";
+import { CorrespondenceLetterSection } from "@/components/correspondence-letter-section";
+import { EvidenceDocRow } from "@/components/evidence-doc-row";
+import { PolicyContextSection } from "@/components/policy-context-section";
+import { RequiredDocumentationSection } from "@/components/required-documentation-section";
 import type { AppealCycle } from "@/lib/appeal-workflow";
-
-const evidenceIcon = {
-    image: ImageIcon,
-    pdf: FileText,
-    lab: BarChart3,
-} as const;
 
 type ReviewTab = "overview" | "tree";
 
 export function AppealCycleReview({
     cycles,
     selectedCycleId,
+    caseId,
+    submitted,
+    policyCodes,
+    policyFile,
+    policyRef,
 }: {
     cycles: AppealCycle[];
     selectedCycleId: string;
+    caseId: string;
+    submitted?: string;
+    policyCodes: string[];
+    policyFile: string;
+    policyRef: string;
 }) {
     const cycle =
         cycles.find((c) => c.id === selectedCycleId) ??
@@ -56,7 +63,15 @@ export function AppealCycleReview({
             </div>
 
             {tab === "overview" ? (
-                <OverviewTab cycle={cycle} denied={denied} />
+                <OverviewTab
+                    cycle={cycle}
+                    denied={denied}
+                    caseId={caseId}
+                    submitted={submitted}
+                    policyCodes={policyCodes}
+                    policyFile={policyFile}
+                    policyRef={policyRef}
+                />
             ) : (
                 <DecisionTreeView
                     criteria={cycle.criteria}
@@ -70,9 +85,19 @@ export function AppealCycleReview({
 function OverviewTab({
     cycle,
     denied,
+    caseId,
+    submitted,
+    policyCodes,
+    policyFile,
+    policyRef,
 }: {
     cycle: AppealCycle;
     denied: boolean;
+    caseId: string;
+    submitted?: string;
+    policyCodes: string[];
+    policyFile: string;
+    policyRef: string;
 }) {
     return (
         <>
@@ -107,21 +132,6 @@ function OverviewTab({
                                 {cycle.aiSummary.recommendation}
                             </p>
                         </div>
-                        <div className="text-right">
-                            <p
-                                className={cn(
-                                    "text-3xl font-bold",
-                                    denied
-                                        ? "text-destructive"
-                                        : "text-success",
-                                )}
-                            >
-                                {cycle.aiSummary.confidence}%
-                            </p>
-                            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                                Confidence Score
-                            </p>
-                        </div>
                     </div>
                 </div>
             </section>
@@ -137,38 +147,33 @@ function OverviewTab({
                 </section>
             )}
 
+            <RequiredDocumentationSection
+                caseId={caseId}
+                submitted={submitted}
+            />
+
             <section className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
                 <header className="border-b border-border px-5 py-4">
                     <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                        Evidence · {cycle.label} ({cycle.evidence.length})
+                        Supporting Evidence · {cycle.label} ({cycle.evidence.length})
                     </h2>
                 </header>
                 <ul className="divide-y divide-border">
-                    {cycle.evidence.map((doc) => {
-                        const Icon = evidenceIcon[doc.type];
-                        return (
-                            <li
-                                key={doc.name}
-                                className="flex items-center justify-between gap-3 px-5 py-3"
-                            >
-                                <div className="flex min-w-0 items-center gap-3">
-                                    <Icon className="size-4 shrink-0 text-primary" />
-                                    <div className="min-w-0">
-                                        <p className="truncate text-sm font-medium text-foreground">
-                                            {doc.name}
-                                        </p>
-                                        <p className="text-xs text-muted-foreground">
-                                            Added {doc.added} · {doc.size}
-                                            {doc.changeNote &&
-                                                ` · ${doc.changeNote}`}
-                                        </p>
-                                    </div>
-                                </div>
-                            </li>
-                        );
-                    })}
+                    {cycle.evidence.map((doc) => (
+                        <EvidenceDocRow key={doc.name} doc={doc} />
+                    ))}
                 </ul>
             </section>
+
+            {cycle.letter && (
+                <CorrespondenceLetterSection letter={cycle.letter} />
+            )}
+
+            <PolicyContextSection
+                policyCodes={policyCodes}
+                policyFile={policyFile}
+                policyRef={policyRef}
+            />
         </>
     );
 }

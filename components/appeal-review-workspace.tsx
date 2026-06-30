@@ -17,11 +17,14 @@ import { AppealCycleReview } from "@/components/appeal-cycle-review"
 import { useAppealWorkflow } from "@/components/appeal-workflow-context"
 import { cn } from "@/lib/utils"
 import type { AppealRequest } from "@/lib/data"
+import type { AppealLetter } from "@/lib/appeal-letters"
+import type { AppealLetterContext } from "@/lib/appeal-letters"
 import {
   REVIEW_ACTIONS,
   applyAction,
   getActiveCycle,
   getOutcomeButtonClass,
+  resolveCycleId,
   type ActionDefinition,
   type AppealWorkflowState,
   type WorkflowEventType,
@@ -29,10 +32,10 @@ import {
 
 export function AppealReviewWorkspace({
   appeal,
-  initialCycleId,
+  requestedCycleId,
 }: {
   appeal: AppealRequest
-  initialCycleId: string
+  requestedCycleId?: string
 }) {
   const defaults: AppealWorkflowState = {
     events: appeal.events,
@@ -43,19 +46,27 @@ export function AppealReviewWorkspace({
 
   const [state, setState] = useAppealWorkflow(appeal.id, defaults)
   const activeCycle = getActiveCycle(state.cycles)
-  const [selectedCycleId, setSelectedCycleId] = useState(initialCycleId)
+  const [selectedCycleId, setSelectedCycleId] = useState(() =>
+    resolveCycleId(defaults.cycles, requestedCycleId),
+  )
   const [pendingAction, setPendingAction] = useState<ActionDefinition | null>(
     null,
   )
 
   useEffect(() => {
-    setSelectedCycleId(initialCycleId)
-  }, [initialCycleId])
+    setSelectedCycleId(resolveCycleId(state.cycles, requestedCycleId))
+  }, [requestedCycleId, state.cycles])
 
   const executeAction = useCallback(
-    (action: ActionDefinition) => {
+    (action: ActionDefinition, letter?: AppealLetter) => {
       setState((prev) => {
-        const next = applyAction(prev, action, appeal.id, appeal.procedure)
+        const next = applyAction(
+          prev,
+          action,
+          appeal.id,
+          appeal.procedure,
+          letter,
+        )
         if (action.type === "re_appeal_raised") {
           const newActive = getActiveCycle(next.cycles)
           setSelectedCycleId(newActive.id)
@@ -79,11 +90,14 @@ export function AppealReviewWorkspace({
     [],
   )
 
-  const confirmPendingAction = useCallback(() => {
-    if (!pendingAction) return
-    executeAction(pendingAction)
-    setPendingAction(null)
-  }, [pendingAction, executeAction])
+  const confirmPendingAction = useCallback(
+    (letter?: AppealLetter) => {
+      if (!pendingAction) return
+      executeAction(pendingAction, letter)
+      setPendingAction(null)
+    },
+    [pendingAction, executeAction],
+  )
 
   const routingActions = REVIEW_ACTIONS.filter((a) => a.group === "routing")
   const decisionActions = REVIEW_ACTIONS.filter((a) => a.group === "outcome")
@@ -91,6 +105,18 @@ export function AppealReviewWorkspace({
 
   const selectedCycle =
     state.cycles.find((c) => c.id === selectedCycleId) ?? activeCycle
+
+  const letterContext: AppealLetterContext = {
+    caseId: appeal.caseId,
+    procedure: appeal.procedure,
+    procedureCode: appeal.procedureCode,
+    patientName: appeal.patient.name,
+    payerName: appeal.payerName,
+    policyRef: appeal.policyRef,
+    providerName: appeal.provider.name,
+    recommendation: activeCycle.aiSummary.recommendation ?? appeal.recommendation,
+    rationale: activeCycle.aiSummary.rationale,
+  }
   const isActiveCycle = selectedCycle.id === activeCycle.id
   const actionsAvailable = state.status === "In Review"
 
@@ -101,6 +127,11 @@ export function AppealReviewWorkspace({
           <AppealCycleReview
             cycles={state.cycles}
             selectedCycleId={selectedCycleId}
+            caseId={appeal.caseId}
+            submitted={appeal.submitted}
+            policyCodes={appeal.policyCodes}
+            policyFile={appeal.policyFile}
+            policyRef={appeal.policyRef}
           />
         </div>
 
@@ -236,40 +267,16 @@ export function AppealReviewWorkspace({
             </Link>
           )}
 
-          <PolicySidebar appeal={appeal} />
         </div>
       </div>
 
       <ActionConfirmDialog
         action={pendingAction}
+        letterContext={letterContext}
         onConfirm={confirmPendingAction}
         onCancel={() => setPendingAction(null)}
       />
     </>
-  )
-}
-
-function PolicySidebar({ appeal }: { appeal: AppealRequest }) {
-  return (
-    <section className="rounded-xl border border-border bg-card p-5 shadow-sm">
-      <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        Policy Context
-      </h2>
-      <div className="mt-2 flex flex-wrap gap-2">
-        {appeal.policyCodes.map((code) => (
-          <span
-            key={code}
-            className="rounded-md bg-primary/10 px-2 py-1 font-mono text-xs font-medium text-primary"
-          >
-            {code}
-          </span>
-        ))}
-      </div>
-      <p className="mt-3 text-sm font-medium text-foreground">
-        {appeal.policyFile}
-      </p>
-      <p className="mt-1 text-xs text-muted-foreground">{appeal.policyRef}</p>
-    </section>
   )
 }
 

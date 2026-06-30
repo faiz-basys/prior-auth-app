@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation"
 import { Breadcrumb } from "@/components/breadcrumb"
+import { AppealReviewSubtitle } from "@/components/appeal-review-subtitle"
 import { AppealReviewWorkspace } from "@/components/appeal-review-workspace"
 import { getAppeal } from "@/lib/data"
-import { getActiveCycle } from "@/lib/appeal-workflow"
 
 export default async function AppealDetailPage({
   params,
@@ -16,9 +16,12 @@ export default async function AppealDetailPage({
   const req = getAppeal(id)
   if (!req) notFound()
 
-  const selectedCycle =
-    (cycleId && req.cycles.find((c) => c.id === cycleId)) ??
-    getActiveCycle(req.cycles)
+  const workflowDefaults = {
+    events: req.events,
+    cycles: req.cycles,
+    status: req.status,
+    lastUpdated: req.lastUpdated,
+  }
 
   return (
     <div className="w-full">
@@ -29,7 +32,7 @@ export default async function AppealDetailPage({
             label: `Appeal #${req.caseId}`,
             href: `/appeals/${req.id}/timeline`,
           },
-          { label: selectedCycle.label },
+          { label: "Round Review" },
         ]}
       />
 
@@ -38,15 +41,18 @@ export default async function AppealDetailPage({
           <h1 className="text-2xl font-bold tracking-tight text-foreground text-balance">
             Appeal Review: {req.procedure}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {req.caseId} · {selectedCycle.label}
-          </p>
+          <AppealReviewSubtitle
+            appealId={req.id}
+            caseId={req.caseId}
+            defaults={workflowDefaults}
+            requestedCycleId={cycleId}
+          />
         </div>
       </div>
 
       <AppealReviewWorkspace
         appeal={req}
-        initialCycleId={selectedCycle.id}
+        requestedCycleId={cycleId}
       />
     </div>
   )

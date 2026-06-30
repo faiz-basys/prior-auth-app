@@ -4,6 +4,7 @@ import type {
   RequestStatus,
   DecisionTree,
 } from "@/lib/data"
+import type { AppealLetter } from "@/lib/appeal-letters"
 
 export type ReviewOutcome =
   | "approve"
@@ -52,6 +53,7 @@ export interface AppealCycle {
   aiSummary: AppealCycleAiSummary
   status: "active" | "superseded"
   determinationIssue?: { requirement: string; detail: string }
+  letter?: AppealLetter
 }
 
 export interface AppealWorkflowState {
@@ -66,6 +68,19 @@ export function getActiveCycle(cycles: AppealCycle[]): AppealCycle {
     cycles.find((c) => c.status === "active") ??
     cycles[cycles.length - 1]
   )
+}
+
+export function resolveCycleId(
+  cycles: AppealCycle[],
+  requestedCycleId?: string | null,
+): string {
+  if (
+    requestedCycleId &&
+    cycles.some((cycle) => cycle.id === requestedCycleId)
+  ) {
+    return requestedCycleId
+  }
+  return getActiveCycle(cycles).id
 }
 
 export function sortEventsChronologically(events: WorkflowEvent[]): WorkflowEvent[] {
@@ -156,7 +171,8 @@ export const REVIEW_ACTIONS: ActionDefinition[] = [
     type: "denied",
     label: "Deny",
     title: "Appeal Denied",
-    description: "Denial upheld for this appeal cycle.",
+    description:
+      "Denial upheld for this appeal cycle. A denial letter will be generated.",
     outcome: "deny",
     group: "outcome",
   },
@@ -251,6 +267,7 @@ export function applyAction(
   action: ActionDefinition,
   appealId: string,
   procedure: string,
+  letter?: AppealLetter,
 ): AppealWorkflowState {
   const activeCycle = getActiveCycle(state.cycles)
   const now = new Date().toLocaleString("en-US", {
@@ -295,9 +312,17 @@ export function applyAction(
     status = "In Review"
   }
 
+  let cycles = state.cycles
+  if (letter && action.group === "outcome") {
+    cycles = state.cycles.map((c) =>
+      c.id === activeCycle.id ? { ...c, letter } : c,
+    )
+  }
+
   return {
     ...state,
     events: [...state.events, event],
+    cycles,
     status,
     lastUpdated: now,
   }

@@ -27,7 +27,6 @@ export function AppTopbar() {
                 <Button variant="ghost" size="icon" aria-label="Help">
                     <HelpCircle className="size-5 text-muted-foreground" />
                 </Button>
-                <Button className="ml-1">Create Appeal</Button>
                 <div className="ml-2 hidden items-center gap-2 border-l border-border pl-3 lg:flex">
                     <span className="flex size-8 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">
                         KH
