@@ -1,7 +1,6 @@
 import type {
   Criterion,
   EvidenceDoc,
-  RationaleItem,
   RequestStatus,
   DecisionTree,
 } from "@/lib/data"
@@ -39,7 +38,7 @@ export interface AppealCycleAiSummary {
   recommendation: string
   recommendationVerdict: "APPROVED" | "NOT APPROVED" | "PENDING"
   confidence: number
-  rationale: RationaleItem[]
+  rationale: string
   checks: { label: string; sublabel: string; passed: boolean | null }[]
 }
 
@@ -236,7 +235,8 @@ export function createReAppealCycle(
         "New appeal cycle opened. Upload supplemental evidence to generate an updated AI recommendation and decision tree.",
       recommendationVerdict: "PENDING",
       confidence: 0,
-      rationale: [],
+      rationale:
+        "New appeal cycle opened. Upload supplemental evidence to generate an updated AI recommendation and decision tree. A narrative rationale will be produced once clinical documentation has been analyzed against the applicable policy criteria.",
       checks: [
         { label: "Medical Necessity", sublabel: "Pending", passed: null },
         { label: "Plan Eligibility", sublabel: "Pending", passed: null },
