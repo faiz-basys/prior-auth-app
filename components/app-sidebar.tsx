@@ -4,7 +4,6 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   LayoutGrid,
-  ShieldCheck,
   ClipboardList,
   Settings,
   LifeBuoy,
@@ -12,19 +11,20 @@ import {
 import { cn } from "@/lib/utils"
 
 const nav = [
-  { label: "Navigation", href: "/navigation", icon: LayoutGrid },
-  { label: "Policies", href: "/policies", icon: ShieldCheck },
-  { label: "Prior Auth Requests", href: "/", icon: ClipboardList },
+  { label: "Dashboard", href: "/", icon: LayoutGrid },
+  { label: "Appeals", href: "/appeals", icon: ClipboardList },
 ]
 
 export function AppSidebar() {
   const pathname = usePathname()
 
   const isActive = (href: string) =>
-    href === "/" ? pathname === "/" || pathname.startsWith("/requests") : pathname === href
+    href === "/"
+      ? pathname === "/"
+      : pathname === href || pathname.startsWith(`${href}/`)
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar lg:flex">
+    <aside className="fixed left-0 top-0 z-30 hidden h-screen w-64 flex-col border-r border-sidebar-border bg-sidebar lg:flex">
       <div className="px-6 py-5">
         <h1 className="text-lg font-bold tracking-tight text-foreground">
           FHP Admin
@@ -62,15 +62,31 @@ export function AppSidebar() {
       <div className="mt-auto flex flex-col gap-1 px-3 py-4">
         <Link
           href="/settings"
-          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent/50"
+          className={cn(
+            "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+            isActive("/settings")
+              ? "bg-sidebar-accent text-sidebar-accent-foreground"
+              : "text-sidebar-foreground hover:bg-sidebar-accent/50",
+          )}
         >
+          {isActive("/settings") && (
+            <span className="absolute -left-3 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-primary" />
+          )}
           <Settings className="size-5 shrink-0" />
           Settings
         </Link>
         <Link
           href="/support"
-          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent/50"
+          className={cn(
+            "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+            isActive("/support")
+              ? "bg-sidebar-accent text-sidebar-accent-foreground"
+              : "text-sidebar-foreground hover:bg-sidebar-accent/50",
+          )}
         >
+          {isActive("/support") && (
+            <span className="absolute -left-3 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-primary" />
+          )}
           <LifeBuoy className="size-5 shrink-0" />
           Support
         </Link>

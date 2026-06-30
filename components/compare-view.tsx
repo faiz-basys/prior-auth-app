@@ -15,7 +15,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import type { Criterion, DocChange, EvidenceDoc, PriorAuthRequest, RequestStatus } from "@/lib/data"
+import type { Criterion, DocChange, EvidenceDoc, AppealRequest, RequestStatus } from "@/lib/data"
 
 type Mode = "overview" | "tree"
 
@@ -47,7 +47,7 @@ function appealDecisionStyle(decision: RequestStatus) {
   }
 }
 
-export function CompareView({ req }: { req: PriorAuthRequest }) {
+export function CompareView({ req }: { req: AppealRequest }) {
   const [mode, setMode] = useState<Mode>("overview")
   const appeal = req.appeal!
   const appealStyle = appealDecisionStyle(appeal.decision)
@@ -153,7 +153,7 @@ function SummaryItem({ label, value }: { label: string; value: string }) {
 
 /* ---------------- Overview Comparison ---------------- */
 
-function OverviewComparison({ req }: { req: PriorAuthRequest }) {
+function OverviewComparison({ req }: { req: AppealRequest }) {
   const appeal = req.appeal!
   const appealStyle = appealDecisionStyle(appeal.decision)
   return (
@@ -457,7 +457,7 @@ function flatten(criteria: Criterion[]): Criterion[] {
   return criteria.flatMap((c) => [c, ...(c.children ? flatten(c.children) : [])])
 }
 
-function TreeComparison({ req }: { req: PriorAuthRequest }) {
+function TreeComparison({ req }: { req: AppealRequest }) {
   const appeal = req.appeal!
   const appealStyle = appealDecisionStyle(appeal.decision)
   const originalMap = new Map(flatten(req.criteria).map((c) => [c.id, c]))
