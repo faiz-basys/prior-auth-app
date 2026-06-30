@@ -32,7 +32,7 @@ export default async function AppealDetailPage({
                         label: `Appeal #${req.caseId}`,
                         href: `/appeals/${req.id}/timeline`,
                     },
-                    { label: "Level Review" },
+                    { label: "Review" },
                 ]}
             />
 
