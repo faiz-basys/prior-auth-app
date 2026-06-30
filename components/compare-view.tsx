@@ -396,50 +396,52 @@ function DocList({
                             >
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="flex min-w-0 flex-1 items-start gap-3">
-                                    <Icon className="mt-0.5 size-4 shrink-0 text-primary" />
-                                    <div className="min-w-0 flex-1">
-                                        <div className="flex flex-wrap items-center gap-2">
-                                            <p className="truncate text-sm font-medium text-foreground">
-                                                {doc.name}
-                                            </p>
-                                            {doc.change && (
-                                                <span
-                                                    className={cn(
-                                                        "shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase",
-                                                        styles.badge,
-                                                    )}
-                                                >
-                                                    {styles.label}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <p className="text-xs text-muted-foreground">
-                                            Added {doc.added} · {doc.size}
-                                        </p>
-                                        {doc.changeNote && (
-                                            <p
-                                                className={cn(
-                                                    "mt-1 text-xs leading-relaxed",
-                                                    change === "new" &&
-                                                        "text-success",
-                                                    change === "updated" &&
-                                                        "text-warning",
-                                                    change === "insufficient" &&
-                                                        "text-destructive",
-                                                    change === "unchanged" &&
-                                                        "text-muted-foreground",
-                                                )}
-                                            >
-                                                {doc.changeNote}
-                                                {doc.relatedDoc && (
-                                                    <span className="font-medium">
-                                                        {" "}
-                                                        → {doc.relatedDoc}
+                                        <Icon className="mt-0.5 size-4 shrink-0 text-primary" />
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <p className="truncate text-sm font-medium text-foreground">
+                                                    {doc.name}
+                                                </p>
+                                                {doc.change && (
+                                                    <span
+                                                        className={cn(
+                                                            "shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase",
+                                                            styles.badge,
+                                                        )}
+                                                    >
+                                                        {styles.label}
                                                     </span>
                                                 )}
+                                            </div>
+                                            <p className="text-xs text-muted-foreground">
+                                                Added {doc.added} · {doc.size}
                                             </p>
-                                        )}
-                                    </div>
+                                            {doc.changeNote && (
+                                                <p
+                                                    className={cn(
+                                                        "mt-1 text-xs leading-relaxed",
+                                                        change === "new" &&
+                                                            "text-success",
+                                                        change === "updated" &&
+                                                            "text-warning",
+                                                        change ===
+                                                            "insufficient" &&
+                                                            "text-destructive",
+                                                        change ===
+                                                            "unchanged" &&
+                                                            "text-muted-foreground",
+                                                    )}
+                                                >
+                                                    {doc.changeNote}
+                                                    {doc.relatedDoc && (
+                                                        <span className="font-medium">
+                                                            {" "}
+                                                            → {doc.relatedDoc}
+                                                        </span>
+                                                    )}
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
                                     <DocumentViewButton />
                                 </div>
@@ -504,7 +506,7 @@ function ConfidenceRing({ value }: { value: number }) {
                     fill="none"
                     stroke="var(--primary)"
                     strokeWidth="8"
-                    strokeLinecap="round"
+                    strokeLinecap="level"
                     strokeDasharray={c}
                     strokeDashoffset={offset}
                 />

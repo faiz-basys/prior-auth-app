@@ -1,4 +1,6 @@
 import type { AppealCycle, WorkflowEvent } from "./appeal-workflow";
+import { demoAppealsData, demoWorkflowSeeds } from "./demo-appeals";
+import { appealDataset } from "./feature-flags";
 import { workflowSeeds } from "./appeal-workflow-seeds";
 
 export type RequestStatus =
@@ -1147,14 +1149,16 @@ export const appealsData: Omit<AppealRequest, "cycles" | "events">[] = [
             {
                 id: "A",
                 label: "SCS Trial Criteria",
-                description: "Chronic intractable pain with failed conservative care.",
+                description:
+                    "Chronic intractable pain with failed conservative care.",
                 state: "not-met",
                 evidence: "Pain diary missing.",
                 children: [
                     {
                         id: "A.2",
                         label: "4-Week Pain Diary",
-                        description: "Documented pain scores over 4 consecutive weeks.",
+                        description:
+                            "Documented pain scores over 4 consecutive weeks.",
                         state: "not-found",
                         evidence: "None",
                     },
@@ -1248,7 +1252,8 @@ export const appealsData: Omit<AppealRequest, "cycles" | "events">[] = [
                 description:
                     "Advanced imaging criteria for musculoskeletal knee evaluation.",
                 state: "not-met",
-                evidence: "Conservative care and prior imaging requirements not met.",
+                evidence:
+                    "Conservative care and prior imaging requirements not met.",
                 children: [
                     {
                         id: "A.1",
@@ -1276,8 +1281,13 @@ export const appealsData: Omit<AppealRequest, "cycles" | "events">[] = [
     },
 ];
 
-export const appeals: AppealRequest[] = appealsData.map((appeal) => {
-    const seed = workflowSeeds[appeal.id];
+const activeAppealsData =
+    appealDataset === "legacy" ? appealsData : demoAppealsData;
+const activeWorkflowSeeds =
+    appealDataset === "legacy" ? workflowSeeds : demoWorkflowSeeds;
+
+export const appeals: AppealRequest[] = activeAppealsData.map((appeal) => {
+    const seed = activeWorkflowSeeds[appeal.id];
     return {
         ...appeal,
         cycles: seed?.cycles ?? [],

@@ -48,7 +48,7 @@ export const workflowSeeds: Record<
                 id: "ag-902341-cycle-1",
                 cycleNumber: 1,
                 raisedAt: "Oct 24, 2023",
-                label: "Round 1 — Initial submission (1 PT file)",
+                label: "Level 1 — Initial submission (1 PT file)",
                 status: "superseded",
                 evidence: [
                     {
@@ -176,7 +176,7 @@ New Century Health`,
                         },
                     ],
                     rationale:
-                        "This determination is based on a structured review of the Round 1 submission against CMS-L33747 lumbar fusion criteria. The patient’s diagnosis of grade II spondylolisthesis at L4-L5 is supported by MRI dated August 2023 and correlates with documented radicular symptoms. However, the inclusion criterion for failure of conservative management is not satisfied. Submitted physical therapy records (PT_Records_V2.pdf) cover only six weeks of treatment, whereas the policy requires a minimum of twelve weeks of documented conservative therapy unless a clinical contraindication is noted. No epidural steroid injection record was found in the initial package, leaving criterion A.2.2 unevaluated as not found. Plan eligibility and provider network status were verified without issue. Exclusion screening did not identify active infection, isolated axial pain without neural compression, or untreated metabolic bone disease. Because the primary medical-necessity pathway depends on demonstrated failure of conservative care, Basys recommends upholding denial at this stage pending supplemental documentation.",
+                        "This determination is based on a structured review of the Level 1 submission against CMS-L33747 lumbar fusion criteria. The patient’s diagnosis of grade II spondylolisthesis at L4-L5 is supported by MRI dated August 2023 and correlates with documented radicular symptoms. However, the inclusion criterion for failure of conservative management is not satisfied. Submitted physical therapy records (PT_Records_V2.pdf) cover only six weeks of treatment, whereas the policy requires a minimum of twelve weeks of documented conservative therapy unless a clinical contraindication is noted. No epidural steroid injection record was found in the initial package, leaving criterion A.2.2 unevaluated as not found. Plan eligibility and provider network status were verified without issue. Exclusion screening did not identify active infection, isolated axial pain without neural compression, or untreated metabolic bone disease. Because the primary medical-necessity pathway depends on demonstrated failure of conservative care, Basys recommends upholding denial at this stage pending supplemental documentation.",
                 },
                 determinationIssue: {
                     requirement: "A.2 (Failure of Conservative Mgmt)",
@@ -187,7 +187,7 @@ New Century Health`,
                 id: "ag-902341-cycle-2",
                 cycleNumber: 2,
                 raisedAt: "Oct 28, 2023",
-                label: "Round 2 — Re-appeal with additional PT logs",
+                label: "Level 2 — Re-appeal with additional PT logs",
                 status: "active",
                 evidence: [
                     {
@@ -353,7 +353,7 @@ New Century Health`,
                         },
                     ],
                     rationale:
-                        "Following receipt of supplemental records in Round 2, Basys re-evaluated the appeal against the same CMS-L33747 decision tree. Diagnosis and imaging correlation criteria remain met: MRI confirms grade II spondylolisthesis at L4-L5 with symptom correlation documented in clinical notes. The prior gap in conservative management is now addressed. PT_Logs_Oct-Jan.pdf documents thirty-two sessions across sixteen weeks (October 2022 through January 2023), satisfying the structured physical therapy requirement. ESI_Record_Feb10.pdf confirms a transforaminal epidural steroid injection at L4-L5 on February 10, 2023, fulfilling the interventional conservative therapy expectation. Exclusion criteria continue to show no active infection, no isolated axial pain pattern, and no untreated bone disease. With all inclusion branches satisfied and no exclusions present, the evidence supports medical necessity for lumbar spinal fusion. Basys therefore recommends approving coverage and overturning the initial denial, with high confidence based on complete documentation of failed conservative care.",
+                        "Following receipt of supplemental records in Level 2, Basys re-evaluated the appeal against the same CMS-L33747 decision tree. Diagnosis and imaging correlation criteria remain met: MRI confirms grade II spondylolisthesis at L4-L5 with symptom correlation documented in clinical notes. The prior gap in conservative management is now addressed. PT_Logs_Oct-Jan.pdf documents thirty-two sessions across sixteen weeks (October 2022 through January 2023), satisfying the structured physical therapy requirement. ESI_Record_Feb10.pdf confirms a transforaminal epidural steroid injection at L4-L5 on February 10, 2023, fulfilling the interventional conservative therapy expectation. Exclusion criteria continue to show no active infection, no isolated axial pain pattern, and no untreated bone disease. With all inclusion branches satisfied and no exclusions present, the evidence supports medical necessity for lumbar spinal fusion. Basys therefore recommends approving coverage and overturning the initial denial, with high confidence based on complete documentation of failed conservative care.",
                 },
             },
         ],
@@ -381,7 +381,7 @@ New Century Health`,
                 cycleNumber: 1,
                 type: "med_director_review",
                 title: "Medical Director Review",
-                description: "Medical Director reviewed Round 1 decision tree.",
+                description: "Medical Director reviewed Level 1 decision tree.",
                 timestamp: "2023-10-28T10:30:00",
             },
             {
@@ -409,7 +409,7 @@ New Century Health`,
                 type: "submit_med_director",
                 title: "Submitted to Medical Director",
                 description:
-                    "Round 2 submitted for Medical Director review with updated AI analysis.",
+                    "Level 2 submitted for Medical Director review with updated AI analysis.",
                 timestamp: "2023-11-01T09:00:00",
             },
         ],
@@ -420,7 +420,7 @@ New Century Health`,
                 id: "ag-882193-cycle-1",
                 cycleNumber: 1,
                 raisedAt: "Oct 21, 2023",
-                label: "Round 1 — Pharmacy appeal (Mavacamten)",
+                label: "Level 1 — Pharmacy appeal (Mavacamten)",
                 status: "active",
                 evidence: [
                     {
@@ -586,7 +586,7 @@ New Century Health`,
                 id: "ag-771045-cycle-1",
                 cycleNumber: 1,
                 raisedAt: "Oct 18, 2023",
-                label: "Round 1 — Initial Rituximab appeal",
+                label: "Level 1 — Initial Rituximab appeal",
                 status: "active",
                 evidence: [
                     {
@@ -711,7 +711,7 @@ New Century Health`,
                 id: "ag-664821-cycle-1",
                 cycleNumber: 1,
                 raisedAt: "Nov 02, 2023",
-                label: "Round 1 — Dupixent appeal",
+                label: "Level 1 — Dupixent appeal",
                 status: "active",
                 evidence: [
                     {
@@ -858,7 +858,7 @@ BlueCross BlueShield TX`,
                 id: "ag-558902-cycle-1",
                 cycleNumber: 1,
                 raisedAt: "Nov 10, 2023",
-                label: "Round 1 — SCS trial appeal",
+                label: "Level 1 — SCS trial appeal",
                 status: "active",
                 evidence: [
                     {
@@ -996,7 +996,7 @@ Aetna`,
                 id: "ag-441203-cycle-1",
                 cycleNumber: 1,
                 raisedAt: "Nov 25, 2023",
-                label: "Round 1 — MRI knee appeal",
+                label: "Level 1 — MRI knee appeal",
                 status: "active",
                 evidence: [
                     {

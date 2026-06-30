@@ -123,10 +123,10 @@ export function RoundCompareView({
         return (
             <div className="rounded-xl border border-border bg-card p-10 text-center shadow-sm">
                 <h2 className="text-lg font-bold text-foreground">
-                    At least two rounds required
+                    At least two levels required
                 </h2>
                 <p className="mt-2 text-sm text-muted-foreground">
-                    Re-raise an appeal to create a second round before
+                    Re-raise an appeal to create a second level before
                     comparing.
                 </p>
             </div>
@@ -140,7 +140,7 @@ export function RoundCompareView({
             <div className="flex flex-wrap items-end justify-between gap-4">
                 <div className="flex flex-wrap items-end gap-3">
                     <CycleSelect
-                        label="Round A"
+                        label="Level A"
                         value={leftId}
                         cycles={sorted}
                         onChange={setLeftId}
@@ -148,7 +148,7 @@ export function RoundCompareView({
                     />
                     <ArrowRight className="mb-2.5 size-5 text-muted-foreground" />
                     <CycleSelect
-                        label="Round B"
+                        label="Level B"
                         value={rightId}
                         cycles={sorted}
                         onChange={setRightId}
@@ -177,7 +177,7 @@ export function RoundCompareView({
 
             {leftId === rightId ? (
                 <p className="mt-6 rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-muted-foreground">
-                    Select two different rounds to compare.
+                    Select two different levels to compare.
                 </p>
             ) : mode === "overview" ? (
                 <OverviewCompare left={left} right={right} />
@@ -222,7 +222,7 @@ function CycleSelect({
                     .filter((c) => c.id !== excludeId)
                     .map((c) => (
                         <option key={c.id} value={c.id}>
-                            Round {c.cycleNumber} — {c.label}
+                            Level {c.cycleNumber} — {c.label}
                         </option>
                     ))}
             </select>
@@ -246,11 +246,11 @@ function OverviewCompare({
         <div className="mt-6 space-y-6">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <DeltaCard
-                    label="Round A verdict"
+                    label="Level A verdict"
                     value={left.aiSummary.recommendationVerdict}
                 />
                 <DeltaCard
-                    label="Round B verdict"
+                    label="Level B verdict"
                     value={right.aiSummary.recommendationVerdict}
                 />
             </div>
@@ -262,7 +262,7 @@ function OverviewCompare({
 
             <section className="rounded-xl border border-border bg-card p-5 shadow-sm">
                 <h3 className="text-base font-bold text-foreground">
-                    What changed between rounds
+                    What changed between levels
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                     {buildSummaryDelta(left, right)}
@@ -286,7 +286,7 @@ function buildSummaryDelta(left: AppealCycle, right: AppealCycle): string {
     const parts: string[] = [];
     if (newDocs.length > 0) {
         parts.push(
-            `Round B added ${newDocs.length} document(s): ${newDocs.map((d) => d.name).join(", ")}.`,
+            `Level B added ${newDocs.length} document(s): ${newDocs.map((d) => d.name).join(", ")}.`,
         );
     }
     if (improved.length > 0) {
@@ -300,7 +300,7 @@ function buildSummaryDelta(left: AppealCycle, right: AppealCycle): string {
         );
     }
     if (parts.length === 0) {
-        return "No significant structural changes detected between the selected rounds.";
+        return "No significant structural changes detected between the selected levels.";
     }
     return parts.join(" ");
 }
@@ -348,7 +348,7 @@ function RoundPanel({
         >
             <div className="border-b border-border bg-muted/30 px-5 py-3">
                 <p className="text-xs font-bold uppercase tracking-wide text-primary">
-                    Round {cycle.cycleNumber}
+                    Level {cycle.cycleNumber}
                 </p>
                 <p className="text-sm font-semibold text-foreground">
                     {cycle.label}
@@ -393,17 +393,20 @@ function TreeCompare({
     return (
         <div className="mt-6 overflow-hidden rounded-xl border border-border bg-card shadow-sm">
             <header className="grid grid-cols-2 gap-4 border-b border-border bg-muted/30 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                <span>Round {left.cycleNumber}</span>
-                <span>Round {right.cycleNumber}</span>
+                <span>Level {left.cycleNumber}</span>
+                <span>Level {right.cycleNumber}</span>
             </header>
             <ul className="divide-y divide-border">
                 {rows.map(({ id, depth }) => {
-                    const l = leftFlat.find((x) => x.criterion.id === id)
-                        ?.criterion;
-                    const r = rightFlat.find((x) => x.criterion.id === id)
-                        ?.criterion;
+                    const l = leftFlat.find(
+                        (x) => x.criterion.id === id,
+                    )?.criterion;
+                    const r = rightFlat.find(
+                        (x) => x.criterion.id === id,
+                    )?.criterion;
                     const changed = l && r && l.state !== r.state;
-                    const indent = depth > 0 ? `${1.25 + depth * 1.25}rem` : undefined;
+                    const indent =
+                        depth > 0 ? `${1.25 + depth * 1.25}rem` : undefined;
 
                     return (
                         <li
@@ -414,17 +417,23 @@ function TreeCompare({
                             )}
                             style={
                                 indent
-                                    ? { paddingLeft: indent, paddingRight: "1.25rem" }
-                                    : { paddingLeft: "1.25rem", paddingRight: "1.25rem" }
+                                    ? {
+                                          paddingLeft: indent,
+                                          paddingRight: "1.25rem",
+                                      }
+                                    : {
+                                          paddingLeft: "1.25rem",
+                                          paddingRight: "1.25rem",
+                                      }
                             }
                         >
                             <CriterionCell
                                 criterion={l}
-                                label={`Round ${left.cycleNumber}`}
+                                label={`Level ${left.cycleNumber}`}
                             />
                             <CriterionCell
                                 criterion={r}
-                                label={`Round ${right.cycleNumber}`}
+                                label={`Level ${right.cycleNumber}`}
                             />
                         </li>
                     );
@@ -506,24 +515,24 @@ function EvidenceCompare({
                 submitted={submitted}
             />
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <EvidenceColumn
-                title={`Only in Round ${left.cycleNumber}`}
-                docs={onlyLeft}
-                emptyLabel="No unique documents"
-                icon={Minus}
-            />
-            <EvidenceColumn
-                title="In both rounds"
-                docs={shared}
-                emptyLabel="No shared documents"
-            />
-            <EvidenceColumn
-                title={`Only in Round ${right.cycleNumber}`}
-                docs={onlyRight}
-                emptyLabel="No new documents"
-                icon={Plus}
-                highlight
-            />
+                <EvidenceColumn
+                    title={`Only in Level ${left.cycleNumber}`}
+                    docs={onlyLeft}
+                    emptyLabel="No unique documents"
+                    icon={Minus}
+                />
+                <EvidenceColumn
+                    title="In both levels"
+                    docs={shared}
+                    emptyLabel="No shared documents"
+                />
+                <EvidenceColumn
+                    title={`Only in Level ${right.cycleNumber}`}
+                    docs={onlyRight}
+                    emptyLabel="No new documents"
+                    icon={Plus}
+                    highlight
+                />
             </div>
         </div>
     );
@@ -577,20 +586,20 @@ function EvidenceColumn({
                                 className="flex items-center justify-between gap-3 px-4 py-3"
                             >
                                 <div className="flex min-w-0 gap-3">
-                                <DocIcon className="size-4 shrink-0 text-primary" />
-                                <div className="min-w-0">
-                                    <p className="truncate text-sm font-medium text-foreground">
-                                        {doc.name}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground">
-                                        {doc.added} · {doc.size}
-                                    </p>
-                                    {doc.changeNote && (
-                                        <p className="mt-0.5 text-xs text-muted-foreground">
-                                            {doc.changeNote}
+                                    <DocIcon className="size-4 shrink-0 text-primary" />
+                                    <div className="min-w-0">
+                                        <p className="truncate text-sm font-medium text-foreground">
+                                            {doc.name}
                                         </p>
-                                    )}
-                                </div>
+                                        <p className="text-xs text-muted-foreground">
+                                            {doc.added} · {doc.size}
+                                        </p>
+                                        {doc.changeNote && (
+                                            <p className="mt-0.5 text-xs text-muted-foreground">
+                                                {doc.changeNote}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
                                 <DocumentViewButton />
                             </li>

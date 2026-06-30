@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { CompareView } from "@/components/compare-view"
 import { getAppeal } from "@/lib/data"
+import { featureFlags } from "@/lib/feature-flags"
 
 export default async function ComparePage({
   params,
@@ -11,6 +12,7 @@ export default async function ComparePage({
   const { id } = await params
   const req = getAppeal(id)
   if (!req) notFound()
+  if (!featureFlags.comparison) notFound()
 
   if (!req.appeal) {
     return (

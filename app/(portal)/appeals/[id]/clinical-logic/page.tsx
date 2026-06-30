@@ -4,6 +4,7 @@ import { FileText, AlertTriangle } from "lucide-react"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { Button } from "@/components/ui/button"
 import { getAppeal, type Criterion } from "@/lib/data"
+import { featureFlags } from "@/lib/feature-flags"
 
 export default async function ClinicalLogicPage({
   params,
@@ -43,12 +44,14 @@ export default async function ClinicalLogicPage({
         <span className="border-b-2 border-primary pb-3 text-sm font-semibold text-primary">
           Decision Tree
         </span>
-        <Link
-          href={`/appeals/${req.id}/compare`}
-          className="border-b-2 border-transparent pb-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-        >
-          Compare Appeal
-        </Link>
+        {featureFlags.comparison && (
+          <Link
+            href={`/appeals/${req.id}/compare`}
+            className="border-b-2 border-transparent pb-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Compare Appeal
+          </Link>
+        )}
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[20rem_1fr]">
