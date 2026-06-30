@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { AppealDetailCards } from "@/components/appeal-detail-cards"
+import { AppealLiveStatus } from "@/components/appeal-live-status"
 import { AppealTimeline } from "@/components/appeal-timeline"
-import { StatusBadge } from "@/components/status-badge"
 import { getAppeal } from "@/lib/data"
 
 export default async function AppealTimelinePage({
@@ -13,6 +13,13 @@ export default async function AppealTimelinePage({
   const { id } = await params
   const appeal = getAppeal(id)
   if (!appeal) notFound()
+
+  const workflowDefaults = {
+    events: appeal.events,
+    cycles: appeal.cycles,
+    status: appeal.status,
+    lastUpdated: appeal.lastUpdated,
+  }
 
   return (
     <div className="w-full">
@@ -37,7 +44,7 @@ export default async function AppealTimelinePage({
             {appeal.submitted}
           </p>
         </div>
-        <StatusBadge status={appeal.status} />
+        <AppealLiveStatus appealId={appeal.id} defaults={workflowDefaults} />
       </div>
 
       <section className="mt-6">
@@ -45,15 +52,7 @@ export default async function AppealTimelinePage({
       </section>
 
       <section className="mt-6">
-        <AppealTimeline
-          appealId={appeal.id}
-          defaults={{
-            events: appeal.events,
-            cycles: appeal.cycles,
-            status: appeal.status,
-            lastUpdated: appeal.lastUpdated,
-          }}
-        />
+        <AppealTimeline appealId={appeal.id} defaults={workflowDefaults} />
       </section>
     </div>
   )

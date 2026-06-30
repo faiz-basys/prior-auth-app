@@ -111,6 +111,8 @@ export function AppealTimeline({
     return map
   }, [events, storedCycles])
 
+  const oldestCycleId = sortedAsc[0]?.id
+
   return (
     <section className="rounded-xl border border-border bg-card shadow-sm">
       <header className="flex flex-wrap items-start justify-between gap-3 border-b border-border px-5 py-4">
@@ -172,9 +174,9 @@ export function AppealTimeline({
                       <FileSearch className="size-4" />
                       Open Review
                     </Link>
-                    {storedCycles.length >= 2 && (
+                    {storedCycles.length >= 2 && cycle.id !== oldestCycleId && (
                       <Link
-                        href={`/appeals/${appealId}/compare-rounds?left=${sortedAsc[0]?.id ?? cycle.id}&right=${cycle.id}`}
+                        href={`/appeals/${appealId}/compare-rounds?left=${oldestCycleId}&right=${cycle.id}`}
                         className="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-border bg-card px-4 text-sm font-medium text-foreground transition-colors hover:bg-muted"
                       >
                         <GitCompare className="size-4" />

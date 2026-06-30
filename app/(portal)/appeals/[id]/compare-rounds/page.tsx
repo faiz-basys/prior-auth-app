@@ -64,6 +64,8 @@ export default async function CompareRoundsPage({
       <div className="mt-6">
         <RoundCompareView
           appealId={appeal.id}
+          caseId={appeal.caseId}
+          submitted={appeal.submitted}
           defaults={{
             events: appeal.events,
             cycles: appeal.cycles,
