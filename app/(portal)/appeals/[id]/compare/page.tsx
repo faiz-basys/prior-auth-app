@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { CompareView } from "@/components/compare-view"
-import { getRequest } from "@/lib/data"
+import { getAppeal } from "@/lib/data"
 
 export default async function ComparePage({
   params,
@@ -9,16 +9,16 @@ export default async function ComparePage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const req = getRequest(id)
+  const req = getAppeal(id)
   if (!req) notFound()
 
   if (!req.appeal) {
     return (
-      <div className="mx-auto max-w-6xl">
+      <div className="w-full">
         <Breadcrumb
           items={[
-            { label: "Worklist", href: "/" },
-            { label: `Case #${req.caseId}`, href: `/requests/${req.id}` },
+            { label: "Appeals", href: "/appeals" },
+            { label: `Case #${req.caseId}`, href: `/appeals/${req.id}/timeline` },
             { label: "Compare Results" },
           ]}
         />
@@ -27,7 +27,7 @@ export default async function ComparePage({
             No appeal on record
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            This request has not been appealed, so there is nothing to compare yet.
+            This appeal has no comparison data yet.
           </p>
         </div>
       </div>
@@ -35,11 +35,11 @@ export default async function ComparePage({
   }
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="w-full">
       <Breadcrumb
         items={[
-          { label: "Requests", href: "/" },
-          { label: `Case #${req.caseId}`, href: `/requests/${req.id}` },
+          { label: "Appeals", href: "/appeals" },
+          { label: `Case #${req.caseId}`, href: `/appeals/${req.id}/timeline` },
           { label: "Compare Results" },
         ]}
       />

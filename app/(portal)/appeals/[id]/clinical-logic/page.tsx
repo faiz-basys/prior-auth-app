@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import { FileText, AlertTriangle } from "lucide-react"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { Button } from "@/components/ui/button"
-import { getRequest, type Criterion } from "@/lib/data"
+import { getAppeal, type Criterion } from "@/lib/data"
 
 export default async function ClinicalLogicPage({
   params,
@@ -11,15 +11,15 @@ export default async function ClinicalLogicPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const req = getRequest(id)
+  const req = getAppeal(id)
   if (!req) notFound()
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="w-full">
       <Breadcrumb
         items={[
-          { label: "Worklist", href: "/" },
-          { label: `Case #${req.caseId}`, href: `/requests/${req.id}` },
+          { label: "Appeals", href: "/appeals" },
+          { label: `Case #${req.caseId}`, href: `/appeals/${req.id}/timeline` },
           { label: "Clinical Logic" },
         ]}
       />
@@ -33,10 +33,9 @@ export default async function ClinicalLogicPage({
         </span>
       </div>
 
-      {/* Tabs */}
       <div className="mt-4 flex items-center gap-6 border-b border-border">
         <Link
-          href={`/requests/${req.id}`}
+          href={`/appeals/${req.id}`}
           className="border-b-2 border-transparent pb-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           Overview
@@ -45,7 +44,7 @@ export default async function ClinicalLogicPage({
           Decision Tree
         </span>
         <Link
-          href={`/requests/${req.id}/compare`}
+          href={`/appeals/${req.id}/compare`}
           className="border-b-2 border-transparent pb-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           Compare Appeal
@@ -53,7 +52,6 @@ export default async function ClinicalLogicPage({
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[20rem_1fr]">
-        {/* Left: case details + policy reference */}
         <div className="flex flex-col gap-6">
           <section className="rounded-xl border border-border bg-card p-5 shadow-sm">
             <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -89,7 +87,6 @@ export default async function ClinicalLogicPage({
           </section>
         </div>
 
-        {/* Right: criterion logic table */}
         <section className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
           <header className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-5 py-4">
             <h2 className="text-base font-bold text-foreground">
